@@ -51,6 +51,9 @@ var mainState = {
         if (this.bird.inWorld == false)
             this.restartGame();
 
+        if (this.bird.angle < 20)
+            this.bird.angle += 1;
+
         game.physics.arcade.overlap(this.bird, this.pipes, this.restartGame, null, this);
     },
 
@@ -58,6 +61,15 @@ var mainState = {
     jump: function () {
         // Add a vertical velocity to the bird
         this.bird.body.velocity.y = -350;
+
+        // Create an animation on the bird
+        var animation = game.add.tween(this.bird);
+
+        // Set the animation to change the angle of the sprite to -20° in 100 milliseconds
+        animation.to({ angle: -20 }, 100);
+
+        // And start the animation
+        animation.start();
     },
 
     // Restart the game
@@ -69,7 +81,7 @@ var mainState = {
     addOnePipe: function (x, y) {
         // Get the first dead pipe of our group
         var pipe = this.pipes.getFirstDead();
-
+        this.pipes.pipe
         // Set the new position of the pipe
         pipe.reset(x, y);
 

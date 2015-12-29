@@ -13,6 +13,7 @@ var mainState = {
         // Load the bird sprite
         game.load.image('bird', 'assets/bird.png');
         game.load.image('pipe', 'assets/pipe.png');
+        game.load.audio('jump', 'assets/jump.wav');
     },
 
     create: function() { 
@@ -33,6 +34,9 @@ var mainState = {
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
 
+        // Create jumnp second
+        this.jumpSound = game.add.audio('jump');
+
         // Create pipe group
         this.pipes = game.add.group(); // Create a group  
         this.pipes.enableBody = true;  // Add physics to the group  
@@ -40,6 +44,10 @@ var mainState = {
 
         // Create pipes every 1.5 seconds
         this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
+
+        // Keep track of current pipe on screen
+        this.currentPipe = null;
+        this.nextPipe = null;
 
         // Keep track of score 
         this.score = 0;
@@ -54,6 +62,8 @@ var mainState = {
 
         if (this.bird.angle < 20)
             this.bird.angle += 1;
+
+        this.checkPipes();
 
         game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this);
     },
@@ -73,6 +83,19 @@ var mainState = {
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
+
+    },
+
+    checkPipes: function(){
+        if (this.currentPipe == null)
+            this.currentPipe = this.nextPipe;
+
+        if (this.currentPipe != null) {
+            if (this.bird.x >= this.currentPipe.x) {
+                this.currentPipe = this.nextPipe
+                this.labelScore.text = ++this.score;
+            }
+        }
     },
 
     // Make the bird jump 
@@ -90,6 +113,9 @@ var mainState = {
 
         // And start the animation
         animation.start();
+
+        // Play jump sound
+        this.jumpSound.play();
     },
 
     // Restart the game
@@ -111,6 +137,8 @@ var mainState = {
         // Kill the pipe when it's no longer visible 
         pipe.checkWorldBounds = true;
         pipe.outOfBoundsKill = true;
+
+        return pipe;
     },
 
     addRowOfPipes: function () {
@@ -119,12 +147,14 @@ var mainState = {
 
         // Add the 6 pipes 
         for (var i = 0; i < 8; i++) {
-            if (i != hole && i != hole + 1) // Give 2 spaces for 'hole'
-                this.addOnePipe(400, i * 60 + 10);
+            if (i != hole && i != hole + 1) {
+                this.nextPipe = this.addOnePipe(400, i * 60 + 10);
+
+            }
         }
 
-        this.score += 1;
-        this.labelScore.text = this.score;
+        //this.score += 1;
+        //this.labelScore.text = this.score;
     },
 };
 

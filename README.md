@@ -1,2 +1,2 @@
-# Flappy-Bird-
-A Web App to be converted using Apache Cordova soon
+# Flappy-Bird
+A Web App to be ported to all popular mobile platforms using Apache Cordova soon

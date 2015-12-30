@@ -17,8 +17,9 @@ var mainState = {
         game.load.image('background', 'assets/bg.png');
         game.load.image('ground', 'assets/ground.png');
         // Load the bird sprite
-        game.load.image('bird', 'assets/bird.png');
-        game.load.image('pipe', 'assets/pipe.png');
+        game.load.image('bird', 'assets/FlappyBird.png');
+        game.load.image('pipe', 'assets/MiddlePipe.png');
+        game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.audio('jump', 'assets/jump.wav');
     },
 
@@ -27,7 +28,7 @@ var mainState = {
         // Here we set up the game, display sprites, etc.  
 
         // Set the physics system
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+        game.physics.startSystem(Phaser.Physics.Arcade);
 
         // Initialize background 
         this.background = game.add.sprite(0, 0, 'background');
@@ -41,7 +42,8 @@ var mainState = {
 
         // Display the bird on the screen
         this.bird = this.game.add.sprite(100, 245, 'bird');
-
+        this.bird.width = 40;
+        this.bird.height = 40;
         // Add gravity to the bird to make it fall
         game.physics.arcade.enable(this.bird);
         this.bird.body.gravity.y = 1000;
@@ -58,6 +60,20 @@ var mainState = {
         this.pipes = game.add.group(); // Create a group  
         this.pipes.enableBody = true;  // Add physics to the group  
         this.pipes.createMultiple(20, 'pipe'); // Create 20 pipes  
+        this.pipes.forEach(function (p) {
+            p.width = SCREEN_WIDTH / 5;
+            p.height = SCREEN_HEIGHT / 8;
+            p.body.setSize(SCREEN_WIDTH/5, SCREEN_HEIGHT/8, 0, 0);
+        }, this)
+
+        this.pipeHeads = game.add.group();
+        this.pipeHeads.enableBody = true;
+        this.pipeHeads.createMultiple(10, 'pipeHead');
+        this.pipeHeads.forEach(function (p) {
+            p.width = SCREEN_WIDTH / 4;
+            p.height = SCREEN_HEIGHT / 16;
+            p.body.setSize(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 16, 0, 0);
+        }, this)
 
         // Create pipes every 1.5 seconds
         this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
@@ -68,7 +84,7 @@ var mainState = {
 
         // Keep track of score 
         this.score = 0;
-        this.labelScore = game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });
+        this.labelScore = game.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT*1/6, "0", { font: "50px Dimitri", fill: "#ffffff"});
     },
 
     update: function() {
@@ -80,18 +96,19 @@ var mainState = {
         if (this.bird.angle < 20)
             this.bird.angle += 1;
 
-        if (this.ground1.x == -SCREEN_WIDTH)
+        if (this.ground1.x <= -SCREEN_WIDTH + 5)
             this.ground1.x = SCREEN_WIDTH;
 
-        if (this.ground2.x == -SCREEN_WIDTH)
+        if (this.ground2.x <= -SCREEN_WIDTH + 5)
             this.ground2.x = SCREEN_WIDTH;
 
-        this.ground1.x-=2;
-        this.ground2.x-=2;
+        this.ground1.x-=200/60;
+        this.ground2.x-=200/60;
 
         this.checkPipes();
 
         game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this);
+        game.physics.arcade.overlap(this.bird, this.pipeHeads, this.hitPipe, null, this);
     },
 
     hitPipe: function () {
@@ -110,6 +127,9 @@ var mainState = {
             p.body.velocity.x = 0;
         }, this);
 
+        this.pipeHeads.forEachAlive(function (p) {
+            p.body.velocity.x = 0;
+        }, this);
     },
 
     // Check when to add score after passing pipe
@@ -151,14 +171,15 @@ var mainState = {
         game.state.start('main');
     },
 
-    addOnePipe: function (x, y) {
+    addOnePipe: function (x, y, isHead) {
         // Get the first dead pipe of our group
-        var pipe = this.pipes.getFirstDead();
-
-        pipe.height = SCREEN_HEIGHT / 8;
+        var pipe = isHead ? this.pipeHeads.getFirstDead() : this.pipes.getFirstDead();
 
         // Set the new position of the pipe
-        pipe.reset(x, y);
+        if (isHead)
+            pipe.reset((x - (SCREEN_WIDTH / 4 - SCREEN_WIDTH / 5)/2), y);
+        else
+            pipe.reset(x, y);
 
         // Add velocity to the pipe to make it move left
         pipe.body.velocity.x = -200;
@@ -176,9 +197,14 @@ var mainState = {
 
         // Add the 5 pipes (iterate 8 times so that 2 spots are holes with 6 pipes)
         for (var i = 8; i > 1; i--) {
-            if (i != hole && i != hole + 1) {
-                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i*SCREEN_HEIGHT/8 - (2*SCREEN_HEIGHT/8));
-
+            if (i == hole + 2) {
+                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true);
+            }
+            else if (i == hole) {
+                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true);
+            }
+            else if (i != hole + 1){
+                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false);
             }
         }
     },

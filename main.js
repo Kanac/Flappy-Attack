@@ -13,10 +13,9 @@ var mainState = {
     preload: function() { 
         // This function will be executed at the beginning     
         // That's where we load the game's assets  
-        // Change the background color of the game
-        //game.stage.backgroundColor = '#71c5cf';
+
         game.load.image('background', 'assets/bg.png');
-       
+
         // Load the bird sprite
         game.load.image('bird', 'assets/bird.png');
         game.load.image('pipe', 'assets/pipe.png');

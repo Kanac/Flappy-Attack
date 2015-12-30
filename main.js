@@ -1,5 +1,11 @@
+/// <reference path="phaser.min.js" />
+
+var SCREEN_WIDTH = 400;
+var SCREEN_HEIGHT = 490;
+
 // Initialize Phaser, and create a 400x490px game
-var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'gameDiv');
+
 
 // Create our 'main' state that will contain the game
 var mainState = {
@@ -8,8 +14,9 @@ var mainState = {
         // This function will be executed at the beginning     
         // That's where we load the game's assets  
         // Change the background color of the game
-        game.stage.backgroundColor = '#71c5cf';
-
+        //game.stage.backgroundColor = '#71c5cf';
+        game.load.image('background', 'assets/bg.png');
+       
         // Load the bird sprite
         game.load.image('bird', 'assets/bird.png');
         game.load.image('pipe', 'assets/pipe.png');
@@ -19,8 +26,14 @@ var mainState = {
     create: function() { 
         // This function is called after the preload function     
         // Here we set up the game, display sprites, etc.  
+
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        // Initialize background 
+        this.background = game.add.sprite(0, 0, 'background');
+        this.background.width = game.width;
+        this.background.height = game.height;
 
         // Display the bird on the screen
         this.bird = this.game.add.sprite(100, 245, 'bird');
@@ -86,6 +99,7 @@ var mainState = {
 
     },
 
+    // Check when to add score after passing pipe
     checkPipes: function(){
         if (this.currentPipe == null)
             this.currentPipe = this.nextPipe;
@@ -163,3 +177,4 @@ var mainState = {
 // Add and start the 'main' state to start the game
 game.state.add('main', mainState);  
 game.state.start('main');  
+

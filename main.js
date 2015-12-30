@@ -18,7 +18,7 @@ var mainState = {
         game.load.image('ground', 'assets/ground.png');
         // Load the bird sprite
         game.load.image('bird', 'assets/FlappyBird.png');
-        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 139/3, 3);
+        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 137/3, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.audio('jump', 'assets/jump.wav');
@@ -49,11 +49,11 @@ var mainState = {
         this.bird = this.game.add.sprite(100, 245, 'redBird');
         this.bird.width = 40;
         this.bird.height = 40;
-        // Add gravity to the bird to make it fall
-        game.physics.arcade.enable(this.bird);
-        this.bird.body.gravity.y = 1000;
         this.bird.anchor.setTo(-0.2, 0.5);
 
+        // Add gravity to the bird to make it fall
+        game.physics.arcade.enable(this.bird);
+        
         // Add animation
         var flap = this.bird.animations.add('flap');
         this.bird.animations.play('flap', 30, true);
@@ -89,6 +89,7 @@ var mainState = {
 
         // Create pipes every 1.5 seconds
         this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
+        this.gameStart = false;
 
         // Keep track of current pipe on screen
         this.currentPipe = null;
@@ -102,6 +103,9 @@ var mainState = {
     update: function() {
         // This function is called 60 times per second    
         // It contains the game's logic   
+        if (this.gameStart)
+            this.bird.body.gravity.y = 1000;
+
         if (this.bird.inWorld == false)
             this.restartGame();
 
@@ -159,6 +163,9 @@ var mainState = {
 
     // Make the bird jump 
     jump: function () {
+        // Set boolean to true to allow for pipes to spawn 
+        this.gameStart = true;
+
         if (this.bird.alive == false)
             return;
         // Add a vertical velocity to the bird
@@ -204,6 +211,9 @@ var mainState = {
     },
 
     addRowOfPipes: function () {
+        if (!this.gameStart)
+            return;
+
         // Pick where the hole will be (number from 3 to 6)
         var hole = Math.floor(Math.random() * 4) + 3;
 

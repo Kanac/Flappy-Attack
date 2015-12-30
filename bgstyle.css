@@ -2,3 +2,9 @@
  background-color: #000000
 }
 
+@font-face {
+  font-family: "Dimitri";
+  src: url("assets/DIMITRI_.TTF")
+  format("truetype");
+}
+

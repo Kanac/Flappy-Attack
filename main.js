@@ -17,8 +17,7 @@ var mainState = {
         game.load.image('background', 'assets/bg.png');
         game.load.image('ground', 'assets/ground.png');
         // Load the bird sprite
-        game.load.image('bird', 'assets/FlappyBird.png');
-        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 137/3, 3);
+        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 46, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.audio('jump', 'assets/jump.wav');
@@ -56,7 +55,7 @@ var mainState = {
         
         // Add animation
         var flap = this.bird.animations.add('flap');
-        this.bird.animations.play('flap', 30, true);
+        this.bird.animations.play('flap', 10, true);
 
         // Call the 'jump' function when the spacekey is hit
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);

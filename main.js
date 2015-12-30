@@ -18,6 +18,7 @@ var mainState = {
         game.load.image('ground', 'assets/ground.png');
         // Load the bird sprite
         game.load.image('bird', 'assets/FlappyBird.png');
+        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 139/3, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.audio('jump', 'assets/jump.wav');
@@ -40,14 +41,22 @@ var mainState = {
         this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
 
+        // Die when past the ground
+        game.world.height = SCREEN_HEIGHT - SCREEN_HEIGHT * 1 / 8;
+
         // Display the bird on the screen
-        this.bird = this.game.add.sprite(100, 245, 'bird');
+        //this.bird = this.game.add.sprite(100, 245, 'bird');
+        this.bird = this.game.add.sprite(100, 245, 'redBird');
         this.bird.width = 40;
         this.bird.height = 40;
         // Add gravity to the bird to make it fall
         game.physics.arcade.enable(this.bird);
         this.bird.body.gravity.y = 1000;
         this.bird.anchor.setTo(-0.2, 0.5);
+
+        // Add animation
+        var flap = this.bird.animations.add('flap');
+        this.bird.animations.play('flap', 30, true);
 
         // Call the 'jump' function when the spacekey is hit
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);

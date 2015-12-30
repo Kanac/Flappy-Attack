@@ -62,6 +62,9 @@ var mainState = {
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
 
+        // Call the 'jump' function when the screen is tapped is hit
+        //game.input.ontap(this.jump, this);
+
         // Create jumnp second
         this.jumpSound = game.add.audio('jump');
 

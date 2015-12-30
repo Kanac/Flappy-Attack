@@ -15,7 +15,7 @@ var mainState = {
         // That's where we load the game's assets  
 
         game.load.image('background', 'assets/bg.png');
-
+        game.load.image('ground', 'assets/ground.png');
         // Load the bird sprite
         game.load.image('bird', 'assets/bird.png');
         game.load.image('pipe', 'assets/pipe.png');
@@ -33,6 +33,11 @@ var mainState = {
         this.background = game.add.sprite(0, 0, 'background');
         this.background.width = game.width;
         this.background.height = game.height;
+
+        this.ground1 = game.add.sprite(0, SCREEN_HEIGHT * 7/8, 'ground');
+        this.ground1.width = SCREEN_WIDTH;
+        this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
+        this.ground2.width = SCREEN_WIDTH;
 
         // Display the bird on the screen
         this.bird = this.game.add.sprite(100, 245, 'bird');
@@ -74,6 +79,15 @@ var mainState = {
 
         if (this.bird.angle < 20)
             this.bird.angle += 1;
+
+        if (this.ground1.x == -SCREEN_WIDTH)
+            this.ground1.x = SCREEN_WIDTH;
+
+        if (this.ground2.x == -SCREEN_WIDTH)
+            this.ground2.x = SCREEN_WIDTH;
+
+        this.ground1.x-=2;
+        this.ground2.x-=2;
 
         this.checkPipes();
 
@@ -140,7 +154,9 @@ var mainState = {
     addOnePipe: function (x, y) {
         // Get the first dead pipe of our group
         var pipe = this.pipes.getFirstDead();
-        this.pipes.pipe
+
+        pipe.height = SCREEN_HEIGHT / 8;
+
         // Set the new position of the pipe
         pipe.reset(x, y);
 
@@ -155,19 +171,16 @@ var mainState = {
     },
 
     addRowOfPipes: function () {
-        // Pick where the hole will be (number from 1 to 5)
-        var hole = Math.floor(Math.random() * 5) + 1;
+        // Pick where the hole will be (number from 3 to 6)
+        var hole = Math.floor(Math.random() * 4) + 3;
 
-        // Add the 6 pipes 
-        for (var i = 0; i < 8; i++) {
+        // Add the 5 pipes (iterate 8 times so that 2 spots are holes with 6 pipes)
+        for (var i = 8; i > 1; i--) {
             if (i != hole && i != hole + 1) {
-                this.nextPipe = this.addOnePipe(400, i * 60 + 10);
+                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i*SCREEN_HEIGHT/8 - (2*SCREEN_HEIGHT/8));
 
             }
         }
-
-        //this.score += 1;
-        //this.labelScore.text = this.score;
     },
 };
 

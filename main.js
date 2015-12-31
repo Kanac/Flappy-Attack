@@ -16,12 +16,13 @@ var mainState = {
 
         game.load.image('background', 'assets/bg.png');
         game.load.image('ground', 'assets/ground.png');
-        game.load.image('tap', 'assets/tap.png');
-        game.load.image('getReady', 'assets/getReady.png');
+        game.load.image('tap', 'assets/Tap.png');
+        game.load.image('getReady', 'assets/GetReady.png');
         game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 46, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.audio('jump', 'assets/jump.wav');
+        game.load.audio('score', 'assets/score.wav');
         game.load.audio('smack', 'assets/smack.wav');
 
     },
@@ -50,6 +51,7 @@ var mainState = {
         this.getReady = game.add.sprite(SCREEN_WIDTH * 1/2 - (SCREEN_WIDTH*2/3)/2, SCREEN_HEIGHT * 2.5 / 10 +15, 'getReady');
         this.getReady.width = SCREEN_WIDTH * 2 / 3;
         this.getReady.height = SCREEN_HEIGHT * 1 / 8;
+
         // Die when past the ground
         game.world.height = SCREEN_HEIGHT - SCREEN_HEIGHT * 1 / 8;
 
@@ -76,6 +78,7 @@ var mainState = {
 
         // Create jumnp second
         this.jumpSound = game.add.audio('jump');
+        this.scoreSound = game.add.audio('score');
         this.smackSound = game.add.audio('smack');
 
         // Create pipe group
@@ -169,9 +172,10 @@ var mainState = {
             this.currentPipe = this.nextPipe;
 
         if (this.currentPipe != null) {
-            if (this.bird.x >= this.currentPipe.x) {
+            if (this.bird.x >= this.currentPipe.x + this.currentPipe.width) {
                 this.currentPipe = this.nextPipe
                 this.labelScore.text = ++this.score;
+                this.scoreSound.play();
             }
         }
     },

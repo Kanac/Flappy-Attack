@@ -19,6 +19,10 @@ var mainState = {
         game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 46, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
+        game.load.image('gameOver', 'assets/GameOver.png');
+        game.load.image('record', 'assets/Record.png');
+        game.load.image('continue', 'assets/Continue.png');
+        game.load.image('share', 'assets/Share.png');
         game.load.audio('jump', 'assets/jump.wav');
         game.load.audio('score', 'assets/score.wav');
         game.load.audio('smack', 'assets/smack.wav');
@@ -40,13 +44,13 @@ var mainState = {
         this.ground1.width = SCREEN_WIDTH;
         this.ground1.height = SCREEN_HEIGHT / 8;
         game.physics.arcade.enable(this.ground1);
-        this.ground1.body.velocity = -200;
+        this.ground1.body.velocity.x = -200;
 
         this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
         this.ground2.height = SCREEN_HEIGHT / 8;
         game.physics.arcade.enable(this.ground2);
-        this.ground2.body.velocity = -200;
+        this.ground2.body.velocity.x = -200;
 
         this.tap = game.add.sprite(SCREEN_WIDTH *1/2 - (SCREEN_WIDTH/3)/2, SCREEN_HEIGHT / 2 + 15, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
@@ -164,6 +168,8 @@ var mainState = {
     endGame: function () {
         this.bird.alive = false;
         game.world.bringToTop(this.bird);
+        game.world.bringToTop(this.ground1);
+        game.world.bringToTop(this.ground2);
         game.time.events.remove(this.timer);
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;
@@ -173,6 +179,47 @@ var mainState = {
         }, this);
         this.ground1.body.velocity.x = 0;
         this.ground2.body.velocity.x = 0;
+
+        this.labelScore.alpha = 0;
+        this.labelScore.x = SCREEN_WIDTH * 3 / 4;
+        this.labelScore.y = SCREEN_HEIGHT * 1 / 2 - this.labelScore.height*1.1;
+
+        this.gameOver = game.add.sprite((SCREEN_WIDTH - SCREEN_WIDTH*2/3)/2, SCREEN_HEIGHT*1/10, "gameOver");
+        this.gameOver.alpha = 0;
+        this.gameOver.width = SCREEN_WIDTH * 2 / 3;
+        this.gameOver.height = SCREEN_HEIGHT * 2 / 11;
+
+        this.record = game.add.sprite((SCREEN_WIDTH - SCREEN_WIDTH * 4 / 5) / 2, SCREEN_HEIGHT * 3 / 10, "record");
+        this.record.alpha = 0;
+        this.record.width = SCREEN_WIDTH * 4 / 5;
+        this.record.height = SCREEN_HEIGHT * 3 / 9;
+
+        this.continue = game.add.button(SCREEN_WIDTH * 1 / 10, SCREEN_HEIGHT * 7 / 8 - SCREEN_HEIGHT * 1.5 / 9, "continue", this.continueClick, this);
+        this.continue.alpha = 0;
+        this.continue.width = SCREEN_WIDTH / 3;
+        this.continue.height = SCREEN_HEIGHT * 1.5 / 9;
+
+        this.share = game.add.button(SCREEN_WIDTH * 6 / 10, SCREEN_HEIGHT * 7 / 8 - SCREEN_HEIGHT * 1.5 / 9, "share", this.shareClick, this);
+        this.share.alpha = 0;
+        this.share.width = SCREEN_WIDTH / 3;
+        this.share.height = SCREEN_HEIGHT * 1.5 / 9;
+
+        this.labelScore.bringToTop();
+
+        game.add.tween(this.gameOver).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 0, 0, false);
+        game.add.tween(this.record).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
+        game.add.tween(this.labelScore).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
+        game.add.tween(this.continue).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
+        game.add.tween(this.share).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
+    },
+
+    continueClick: function(){
+        this.restartGame();
+    },
+
+    shareClick: function () {
+        var url = "https://twitter.com/intent/tweet?text=I+scored+" + this.score + "+points+on+Flappy+Bird!+Try+to+beat+me+at+www.Kanac.github.io/Flappy-Bird+now!"
+        window.open(url);
     },
 
     hitPipe: function () {

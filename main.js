@@ -1,4 +1,4 @@
-/// <reference path="phaser.min.js" />
+/// <reference path="phaser.js" />
 
 var SCREEN_WIDTH = 400;
 var SCREEN_HEIGHT = 490;
@@ -12,7 +12,6 @@ var mainState = {
     preload: function() { 
         // This function will be executed at the beginning     
         // That's where we load the game's assets  
-
         game.load.image('background', 'assets/bg.png');
         game.load.image('ground', 'assets/ground.png');
         game.load.image('tap', 'assets/Tap.png');
@@ -32,7 +31,6 @@ var mainState = {
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.Arcade);
-
         // Initialize background 
         this.background = game.add.sprite(0, 0, 'background');
         this.background.width = game.width;
@@ -40,8 +38,15 @@ var mainState = {
 
         this.ground1 = game.add.sprite(0, SCREEN_HEIGHT * 7/8, 'ground');
         this.ground1.width = SCREEN_WIDTH;
+        this.ground1.height = SCREEN_HEIGHT / 8;
+        game.physics.arcade.enable(this.ground1);
+        this.ground1.body.velocity = -200;
+
         this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
+        this.ground2.height = SCREEN_HEIGHT / 8;
+        game.physics.arcade.enable(this.ground2);
+        this.ground2.body.velocity = -200;
 
         this.tap = game.add.sprite(SCREEN_WIDTH *1/2 - (SCREEN_WIDTH/3)/2, SCREEN_HEIGHT / 2 + 15, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
@@ -118,23 +123,26 @@ var mainState = {
         if (this.gameStart)
             this.bird.body.gravity.y = 1250;
 
-        if (this.bird.inWorld == false)
-            this.restartGame();
+        if (this.bird.y <= this.bird.height)
+            this.bird.y = this.bird.height;
 
+        if (this.bird.y >= this.ground1.y - this.bird.height*1.5) {
+            this.hitGround();
+        }
+        // Don't change bird angle before game starts
         if (this.bird.angle > 0 && !this.gameStart)
             this.bird.angle += 1
-        else if (this.bird.angle < 20 && this.gameStart) {
-            this.bird.angle += 1;
+        // constantly lower the bird's angle to -90 
+        else if (this.bird.angle < 90 && this.gameStart) {
+            this.bird.angle += 2;
         }
 
-        if (this.ground1.x <= -SCREEN_WIDTH + 5)
+        // Scroll the ground to the left 
+        if (this.ground1.x <= -SCREEN_WIDTH + 3)
             this.ground1.x = SCREEN_WIDTH;
 
-        if (this.ground2.x <= -SCREEN_WIDTH + 5)
+        if (this.ground2.x <= -SCREEN_WIDTH + 3)
             this.ground2.x = SCREEN_WIDTH;
-
-        this.ground1.x-=200/60;
-        this.ground2.x-=200/60;
 
         this.checkPipes();
 
@@ -142,28 +150,37 @@ var mainState = {
         game.physics.arcade.overlap(this.bird, this.pipeHeads, this.hitPipe, null, this);
     },
 
-    hitPipe: function () {
-        // If the bird has already hit a pipe, we have nothing to do
-        if (this.bird.alive == false)
-            return;
+    // Stops the bird from moving once it hits ground
+    hitGround: function () {
+        this.bird.body.moves = false;
+        if (this.bird.alive) {  // If alive still, means it did not die from pipe, so finish up the work
+            this.smackSound.play();
+            this.bird.alive = false;
+            this.endGame();
+        }
+    },
 
-        // Set the alive property of the bird to false
+    // Stops everything in the game
+    endGame: function () {
         this.bird.alive = false;
         game.world.bringToTop(this.bird);
-
-        // Prevent new pipes from appearing
         game.time.events.remove(this.timer);
-
-        // Go through all the pipes, and stop their movement
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
-
         this.pipeHeads.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
+        this.ground1.body.velocity.x = 0;
+        this.ground2.body.velocity.x = 0;
+    },
+
+    hitPipe: function () {
+        if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
+            return;
 
         this.smackSound.play();
+        this.endGame();
     },
 
     // Check when to add score after passing pipe
@@ -184,8 +201,8 @@ var mainState = {
     jump: function () {
         // Set boolean to true to allow for pipes to spawn 
         if (!this.gameStart) {
-            game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, -1, false);
-            game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, -1, false);
+            game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+            game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
         }
         this.gameStart = true;
 

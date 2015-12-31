@@ -16,11 +16,14 @@ var mainState = {
 
         game.load.image('background', 'assets/bg.png');
         game.load.image('ground', 'assets/ground.png');
-        // Load the bird sprite
+        game.load.image('tap', 'assets/tap.png');
+        game.load.image('getReady', 'assets/getReady.png');
         game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 46, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.audio('jump', 'assets/jump.wav');
+        game.load.audio('smack', 'assets/smack.wav');
+
     },
 
     create: function() { 
@@ -40,6 +43,13 @@ var mainState = {
         this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
 
+        this.tap = game.add.sprite(SCREEN_WIDTH *1/2 - (SCREEN_WIDTH/3)/2, SCREEN_HEIGHT / 2 + 15, 'tap');
+        this.tap.width = SCREEN_WIDTH * 1 / 3;
+        this.tap.height = SCREEN_HEIGHT * 1 / 10;
+
+        this.getReady = game.add.sprite(SCREEN_WIDTH * 1/2 - (SCREEN_WIDTH*2/3)/2, SCREEN_HEIGHT * 2.5 / 10 +15, 'getReady');
+        this.getReady.width = SCREEN_WIDTH * 2 / 3;
+        this.getReady.height = SCREEN_HEIGHT * 1 / 8;
         // Die when past the ground
         game.world.height = SCREEN_HEIGHT - SCREEN_HEIGHT * 1 / 8;
 
@@ -66,6 +76,7 @@ var mainState = {
 
         // Create jumnp second
         this.jumpSound = game.add.audio('jump');
+        this.smackSound = game.add.audio('smack');
 
         // Create pipe group
         this.pipes = game.add.group(); // Create a group  
@@ -96,7 +107,7 @@ var mainState = {
 
         // Keep track of score 
         this.score = 0;
-        this.labelScore = game.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT*1/6, "0", { font: "50px Dimitri", fill: "#ffffff"});
+        this.labelScore = game.add.text(SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT*1/6, "0", { font: "50px Dimitri", fill: "#ffffff"});
     },
 
     update: function() {
@@ -108,8 +119,11 @@ var mainState = {
         if (this.bird.inWorld == false)
             this.restartGame();
 
-        if (this.bird.angle < 20)
+        if (this.bird.angle > 0 && !this.gameStart)
+            this.bird.angle += 1
+        else if (this.bird.angle < 20 && this.gameStart) {
             this.bird.angle += 1;
+        }
 
         if (this.ground1.x <= -SCREEN_WIDTH + 5)
             this.ground1.x = SCREEN_WIDTH;
@@ -145,6 +159,8 @@ var mainState = {
         this.pipeHeads.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
+
+        this.smackSound.play();
     },
 
     // Check when to add score after passing pipe
@@ -164,6 +180,8 @@ var mainState = {
     jump: function () {
         // Set boolean to true to allow for pipes to spawn 
         this.gameStart = true;
+        this.tap.visible = false;
+        this.getReady.visible = false;
 
         if (this.bird.alive == false)
             return;

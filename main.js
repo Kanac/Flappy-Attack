@@ -6,7 +6,6 @@ var SCREEN_HEIGHT = 490;
 // Initialize Phaser, and create a 400x490px game
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'gameDiv');
 
-
 // Create our 'main' state that will contain the game
 var mainState = {
 
@@ -58,8 +57,8 @@ var mainState = {
         // Display the bird on the screen
         //this.bird = this.game.add.sprite(100, 245, 'bird');
         this.bird = this.game.add.sprite(100, 245, 'redBird');
-        this.bird.width = 40;
-        this.bird.height = 40;
+        this.bird.width = 45;
+        this.bird.height = 32;
         this.bird.anchor.setTo(-0.2, 0.5);
 
         // Add gravity to the bird to make it fall
@@ -117,7 +116,7 @@ var mainState = {
         // This function is called 60 times per second    
         // It contains the game's logic   
         if (this.gameStart)
-            this.bird.body.gravity.y = 1000;
+            this.bird.body.gravity.y = 1250;
 
         if (this.bird.inWorld == false)
             this.restartGame();
@@ -150,6 +149,7 @@ var mainState = {
 
         // Set the alive property of the bird to false
         this.bird.alive = false;
+        game.world.bringToTop(this.bird);
 
         // Prevent new pipes from appearing
         game.time.events.remove(this.timer);
@@ -235,15 +235,17 @@ var mainState = {
         if (!this.gameStart)
             return;
 
-        // Pick where the hole will be (number from 3 to 6)
-        var hole = Math.floor(Math.random() * 4) + 3;
+        // Pick where the hole will be (number from 2 to 6)
+        var hole = Math.floor(Math.random() * 5) + 2;
 
         // Add the 5 pipes (iterate 8 times so that 2 spots are holes with 6 pipes)
         for (var i = 8; i > 1; i--) {
             if (i == hole + 2) {
+                // Place bottom pipe head
                 this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true);
             }
             else if (i == hole) {
+                // Place top pipe head
                 this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true);
             }
             else if (i != hole + 1){

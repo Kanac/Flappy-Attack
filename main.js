@@ -183,9 +183,11 @@ var mainState = {
     // Make the bird jump 
     jump: function () {
         // Set boolean to true to allow for pipes to spawn 
+        if (!this.gameStart) {
+            game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, -1, false);
+            game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, -1, false);
+        }
         this.gameStart = true;
-        this.tap.visible = false;
-        this.getReady.visible = false;
 
         if (this.bird.alive == false)
             return;
@@ -209,6 +211,8 @@ var mainState = {
     restartGame: function () {
         // Start the 'main' state, which restarts the game
         game.state.start('main');
+        if (this.bird.alive)
+            this.smackSound.play();
     },
 
     addOnePipe: function (x, y, isHead) {

@@ -9,13 +9,18 @@ window.onload = function () {
     document.getElementById("gameDiv").setAttribute("style", "width:" + SCREEN_WIDTH + "px;height:" + SCREEN_HEIGHT + "px; margin: 0 auto");
 }
 
+
 // Initialize Phaser, and create a 400x490px game
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'gameDiv');
 
 // Create our 'main' state that will contain the game
 var mainState = {
 
-    preload: function() { 
+    //render: function(){
+    //    game.debug.body(this.bird);
+    //},
+
+    preload: function () {
         // This function will be executed at the beginning     
         // That's where we load the game's assets  
         game.load.image('background1', 'assets/bg1.png');
@@ -41,7 +46,7 @@ var mainState = {
         game.load.audio('smack', 'assets/smack.wav');
     },
 
-    create: function() { 
+    create: function () {
         // This function is called after the preload function     
         // Here we set up the game, display sprites, etc.  
 
@@ -53,23 +58,23 @@ var mainState = {
         this.background.width = game.width;
         this.background.height = game.height;
 
-        this.ground1 = game.add.sprite(0, SCREEN_HEIGHT * 7/8, 'ground');
+        this.ground1 = game.add.sprite(0, SCREEN_HEIGHT * 7 / 8, 'ground');
         this.ground1.width = SCREEN_WIDTH;
         this.ground1.height = SCREEN_HEIGHT / 8;
         game.physics.arcade.enable(this.ground1);
         this.ground1.body.velocity.x = SCREEN_WIDTH / -2;
 
-        this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
+        this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7 / 8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
         this.ground2.height = SCREEN_HEIGHT / 8;
         game.physics.arcade.enable(this.ground2);
         this.ground2.body.velocity.x = SCREEN_WIDTH / -2;
 
-        this.tap = game.add.sprite(SCREEN_WIDTH *1/2 - (SCREEN_WIDTH/3)/2, SCREEN_HEIGHT / 2 + 15, 'tap');
+        this.tap = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH / 3) / 2, SCREEN_HEIGHT / 2 + 15, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
         this.tap.height = SCREEN_HEIGHT * 1 / 10;
 
-        this.getReady = game.add.sprite(SCREEN_WIDTH * 1/2 - (SCREEN_WIDTH*2/3)/2, SCREEN_HEIGHT * 2.5 / 10 +15, 'getReady');
+        this.getReady = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH * 2 / 3) / 2, SCREEN_HEIGHT * 2.5 / 10 + 15, 'getReady');
         this.getReady.width = SCREEN_WIDTH * 2 / 3;
         this.getReady.height = SCREEN_HEIGHT * 1 / 8;
 
@@ -88,13 +93,9 @@ var mainState = {
         }
 
         this.bird.width = 45 * SCREEN_WIDTH / 600;
-        this.bird.height = 45 * SCREEN_HEIGHT / 600;
+        this.bird.height = this.bird.width;
         this.bird.anchor.setTo(-0.2, 0.5);
-
-        // Add gravity to the bird to make it fall
         game.physics.arcade.enable(this.bird);
-        
-        // Add animation
         var flap = this.bird.animations.add('flap');
         this.bird.animations.play('flap', 10, true);
 
@@ -118,7 +119,7 @@ var mainState = {
         this.pipes.forEach(function (p) {
             p.width = SCREEN_WIDTH / 6;
             p.height = SCREEN_HEIGHT / 8;
-            p.body.setSize(SCREEN_WIDTH/6, SCREEN_HEIGHT/8, 0, 0);
+            p.body.setSize(SCREEN_WIDTH / 6, SCREEN_HEIGHT / 8, 0, 0);
         }, this)
 
         this.pipeHeads = game.add.group();
@@ -144,6 +145,13 @@ var mainState = {
         if (localStorage.getItem('score') == null)
             localStorage.setItem('score', 0);
 
+        // Create Pause button
+        this.labelPause = game.add.text(SCREEN_WIDTH * 6 / 10, 15, "Pause", { font: "50px Dimitri", fill: "#ffffff" });
+        this.labelPause.inputEnabled = true;
+        this.labelPause.events.onInputDown.add(this.pause, this);
+        // Add in ability to resume
+        game.input.onDown.add(this.resume, this);
+
         ++gameCount;
     },
 
@@ -157,13 +165,14 @@ var mainState = {
             this.bird.y = this.bird.height;
 
         // bird has some transparant vertical overhead, so bird.y will not match ground1.y
-        if (this.bird.y >= this.ground1.y - this.bird.width*1.2) {
+        if (this.bird.y >= this.ground1.y - this.bird.width * 1.2) {
             this.hitGround();
         }
         // Don't change bird angle before game starts
-        if (this.bird.angle > -0 && !this.gameStart)
+        if (this.bird.angle > -0 && !this.gameStart) {
             this.bird.angle = 0;
-        // constantly lower the bird's angle to -90 
+        }
+            // constantly lower the bird's angle to -90 
         else if (this.bird.angle < 90 && this.gameStart) {
             this.bird.angle += 2;
         }
@@ -177,12 +186,63 @@ var mainState = {
 
         this.checkPipes();
 
-        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, this.checkHit, this);
-        game.physics.arcade.overlap(this.bird, this.pipeHeads, this.hitPipe, this.checkHit, this);
+        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this);
+        game.physics.arcade.overlap(this.bird, this.pipeHeads, this.hitPipe, null, this);
     },
 
-    checkHit(){
-    
+    jump: function () {
+        // Set boolean to true to allow for pipes to spawn 
+        if (!this.gameStart) {
+            game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+            game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+        }
+        this.gameStart = true;
+
+        if (this.bird.alive == false)
+            return;
+
+        this.bird.body.velocity.y = SCREEN_WIDTH * -6 / 8;
+
+        var animation = game.add.tween(this.bird);
+        animation.to({ angle: -20 }, 100);
+        animation.start();
+
+        this.jumpSound.play();
+    },
+
+    // Check when to add score after passing pipe
+    checkPipes: function () {
+        if (this.currentRow.length == 0)
+            this.currentRow = this.nextRow;
+        else {
+            if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
+                this.currentRow = this.nextRow;
+                this.labelScore.text = ++this.score;
+                this.scoreSound.play();
+            }
+        }
+    },
+
+    pause: function (item) {
+        game.paused = true;
+        this.labelPause.text = "Resume";
+
+    },
+
+    resume: function (event) {
+        if (this.game.paused) {
+            game.paused = false;
+            if (this.labelPause != null)
+                this.labelPause.text = "Pause";
+        }
+    },
+
+    hitPipe: function () {
+        if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
+            return;
+
+        this.smackSound.play();
+        this.endGame();
     },
 
     // Stops the bird from moving once it hits ground
@@ -223,7 +283,7 @@ var mainState = {
         }
 
 
-        this.gameOver = game.add.sprite((SCREEN_WIDTH - SCREEN_WIDTH*2/3)/2, SCREEN_HEIGHT*1/10, "gameOver");
+        this.gameOver = game.add.sprite((SCREEN_WIDTH - SCREEN_WIDTH * 2 / 3) / 2, SCREEN_HEIGHT * 1 / 10, "gameOver");
         this.gameOver.alpha = 0;
         this.gameOver.width = SCREEN_WIDTH * 2 / 3;
         this.gameOver.height = SCREEN_HEIGHT * 2 / 11;
@@ -283,47 +343,6 @@ var mainState = {
         window.open(url);
     },
 
-    hitPipe: function () {
-        if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
-            return;
-
-        this.smackSound.play();
-        this.endGame();
-    },
-
-    // Check when to add score after passing pipe
-    checkPipes: function(){
-        if (this.currentRow.length == 0)
-            this.currentRow = this.nextRow;
-        else {
-            if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
-                this.currentRow = this.nextRow;
-                this.labelScore.text = ++this.score;
-                this.scoreSound.play();
-            }
-        }
-    },
-
-    jump: function () {
-        // Set boolean to true to allow for pipes to spawn 
-        if (!this.gameStart) {
-            game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
-            game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
-        }
-        this.gameStart = true;
-
-        if (this.bird.alive == false)
-            return;
-
-        this.bird.body.velocity.y = SCREEN_WIDTH * -6 / 8;
-
-        var animation = game.add.tween(this.bird);
-        animation.to({ angle: -20 }, 100);
-        animation.start();
-
-        this.jumpSound.play();
-    },
-
     restartGame: function () {
         // Start the 'main' state, which restarts the game
         game.state.start('main');
@@ -372,7 +391,7 @@ var mainState = {
                 // Place top pipe head
                 this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true));
             }
-            else if (i != hole + 1){
+            else if (i != hole + 1) {
                 this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false));
             }
         }
@@ -380,8 +399,7 @@ var mainState = {
 };
 
 
-
 // Add and start the 'main' state to start the game
-game.state.add('main', mainState);  
-game.state.start('main');  
+game.state.add('main', mainState);
+game.state.start('main');
 

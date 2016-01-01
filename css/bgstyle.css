@@ -1,0 +1,9 @@
+﻿body {
+ background-color: black
+}
+
+@font-face {
+  font-family: "Dimitri";
+  src: url('../assets/DIMITRI_.TTF')
+}
+

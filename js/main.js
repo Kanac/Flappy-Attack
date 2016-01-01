@@ -21,6 +21,9 @@ var mainState = {
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.image('gameOver', 'assets/GameOver.png');
         game.load.image('record', 'assets/Record.png');
+        game.load.image('goldMedal', 'assets/GoldMedal.png');
+        game.load.image('silverMedal', 'assets/SilverMedal.png');
+        game.load.image('bronzeMedal', 'assets/BronzeMedal.png');
         game.load.image('continue', 'assets/Continue.png');
         game.load.image('share', 'assets/Share.png');
         game.load.audio('jump', 'assets/jump.wav');
@@ -118,7 +121,9 @@ var mainState = {
 
         // Keep track of score 
         this.score = 0;
-        this.labelScore = game.add.text(SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT*1/6, "0", { font: "50px Dimitri", fill: "#ffffff"});
+        this.labelScore = game.add.text(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT * 1 / 6, "0", { font: "50px Dimitri", fill: "#ffffff" });
+        if (localStorage.getItem('score') == null)
+            localStorage.setItem('score', 0);
     },
 
     update: function() {
@@ -167,10 +172,13 @@ var mainState = {
     // Stops everything in the game
     endGame: function () {
         this.bird.alive = false;
+
         game.world.bringToTop(this.bird);
         game.world.bringToTop(this.ground1);
         game.world.bringToTop(this.ground2);
+
         game.time.events.remove(this.timer);
+
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
@@ -182,7 +190,12 @@ var mainState = {
 
         this.labelScore.alpha = 0;
         this.labelScore.x = SCREEN_WIDTH * 3 / 4;
-        this.labelScore.y = SCREEN_HEIGHT * 1 / 2 - this.labelScore.height*1.1;
+        this.labelScore.y = SCREEN_HEIGHT * 1 / 2 - this.labelScore.height * 1.1;
+
+        if (this.score > localStorage.getItem('score')) {
+            localStorage.setItem('score', this.score);
+        }
+
 
         this.gameOver = game.add.sprite((SCREEN_WIDTH - SCREEN_WIDTH*2/3)/2, SCREEN_HEIGHT*1/10, "gameOver");
         this.gameOver.alpha = 0;
@@ -193,6 +206,25 @@ var mainState = {
         this.record.alpha = 0;
         this.record.width = SCREEN_WIDTH * 4 / 5;
         this.record.height = SCREEN_HEIGHT * 3 / 9;
+
+        if (this.score >= 20) {
+            if (this.score >= 50) {
+                this.medal = game.add.sprite(SCREEN_WIDTH * 1.8 / 10, SCREEN_HEIGHT * 4 / 10, "goldMedal");
+            }
+            else if (this.score >= 35) {
+                this.medal = game.add.sprite(SCREEN_WIDTH * 1.8 / 10, SCREEN_HEIGHT * 4 / 10, "silverMedal");
+            }
+            else if (this.score >= 20)
+                this.medal = game.add.sprite(SCREEN_WIDTH * 1.8 / 10, SCREEN_HEIGHT * 4 / 10, "bronzeMedal");
+
+            this.medal.alpha = 0;
+            this.medal.width = SCREEN_WIDTH * 2 / 10;
+            this.medal.height = SCREEN_HEIGHT * 2 / 10;
+            this.medal.bringToTop();
+        }
+
+        this.labelHighScore = game.add.text(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT * 1 / 2, localStorage.getItem('score'), { font: "50px Dimitri", fill: "#ffffff" });
+        this.labelHighScore.alpha = 0;
 
         this.continue = game.add.button(SCREEN_WIDTH * 1 / 10, SCREEN_HEIGHT * 7 / 8 - SCREEN_HEIGHT * 1.5 / 9, "continue", this.continueClick, this);
         this.continue.alpha = 0;
@@ -208,7 +240,9 @@ var mainState = {
 
         game.add.tween(this.gameOver).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 0, 0, false);
         game.add.tween(this.record).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
+        if (this.medal != null) game.add.tween(this.medal).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
         game.add.tween(this.labelScore).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
+        game.add.tween(this.labelHighScore).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
         game.add.tween(this.continue).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
         game.add.tween(this.share).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
     },

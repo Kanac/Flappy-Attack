@@ -1,7 +1,11 @@
 /// <reference path="phaser.js" />
 
-var SCREEN_WIDTH = 400;
-var SCREEN_HEIGHT = 490;
+var SCREEN_WIDTH = 500;
+var SCREEN_HEIGHT = 600;
+
+window.onload = function () {
+    document.getElementById("gameDiv").setAttribute("style", "width:" + SCREEN_WIDTH + "px;height:" + SCREEN_HEIGHT + "px; margin: 0 auto");
+}
 
 // Initialize Phaser, and create a 400x490px game
 var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'gameDiv');
@@ -47,13 +51,13 @@ var mainState = {
         this.ground1.width = SCREEN_WIDTH;
         this.ground1.height = SCREEN_HEIGHT / 8;
         game.physics.arcade.enable(this.ground1);
-        this.ground1.body.velocity.x = -200;
+        this.ground1.body.velocity.x = SCREEN_WIDTH / -2;
 
         this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7/8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
         this.ground2.height = SCREEN_HEIGHT / 8;
         game.physics.arcade.enable(this.ground2);
-        this.ground2.body.velocity.x = -200;
+        this.ground2.body.velocity.x = SCREEN_WIDTH / -2;
 
         this.tap = game.add.sprite(SCREEN_WIDTH *1/2 - (SCREEN_WIDTH/3)/2, SCREEN_HEIGHT / 2 + 15, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
@@ -68,9 +72,9 @@ var mainState = {
 
         // Display the bird on the screen
         //this.bird = this.game.add.sprite(100, 245, 'bird');
-        this.bird = this.game.add.sprite(100, 245, 'redBird');
-        this.bird.width = 45;
-        this.bird.height = 32;
+        this.bird = this.game.add.sprite(game.world.centerX * 6/ 10, game.world.centerY, 'redBird');
+        this.bird.width = 45 * SCREEN_WIDTH / 400;
+        this.bird.height = 32 * SCREEN_HEIGHT / 490;
         this.bird.anchor.setTo(-0.2, 0.5);
 
         // Add gravity to the bird to make it fall
@@ -190,7 +194,7 @@ var mainState = {
 
         this.labelScore.alpha = 0;
         this.labelScore.x = SCREEN_WIDTH * 3 / 4;
-        this.labelScore.y = SCREEN_HEIGHT * 1 / 2 - this.labelScore.height * 1.1;
+        this.labelScore.y = game.world.centerY * 8 / 10;
 
         if (this.score > localStorage.getItem('score')) {
             localStorage.setItem('score', this.score);
@@ -223,7 +227,7 @@ var mainState = {
             this.medal.bringToTop();
         }
 
-        this.labelHighScore = game.add.text(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT * 1 / 2, localStorage.getItem('score'), { font: "50px Dimitri", fill: "#ffffff" });
+        this.labelHighScore = game.add.text(SCREEN_WIDTH * 3 / 4, game.world.centerY * 1.05, localStorage.getItem('score'), { font: "50px Dimitri", fill: "#ffffff" });
         this.labelHighScore.alpha = 0;
 
         this.continue = game.add.button(SCREEN_WIDTH * 1 / 10, SCREEN_HEIGHT * 7 / 8 - SCREEN_HEIGHT * 1.5 / 9, "continue", this.continueClick, this);
@@ -290,7 +294,7 @@ var mainState = {
         if (this.bird.alive == false)
             return;
         // Add a vertical velocity to the bird
-        this.bird.body.velocity.y = -350;
+        this.bird.body.velocity.y = SCREEN_WIDTH * -7 / 8;
 
         // Create an animation on the bird
         var animation = game.add.tween(this.bird);
@@ -324,7 +328,7 @@ var mainState = {
             pipe.reset(x, y);
 
         // Add velocity to the pipe to make it move left
-        pipe.body.velocity.x = -200;
+        pipe.body.velocity.x = SCREEN_WIDTH / -2;
 
         // Kill the pipe when it's no longer visible 
         pipe.checkWorldBounds = true;

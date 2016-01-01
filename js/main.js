@@ -252,7 +252,7 @@ var mainState = {
     },
 
     shareClick: function () {
-        var url = "https://twitter.com/intent/tweet?text=I+scored+" + this.score + "+points+on+Flappy+Bird!+Try+to+beat+me+at+www.Kanac.github.io/Flappy-Bird+now!"
+        var url = "https://twitter.com/intent/tweet?text=I+scored+" + this.score + "+points+on+Flappy+Bird!+Try+to+beat+me+at+Kanac.github.io/Flappy-Bird+now!"
         window.open(url);
     },
 
@@ -295,7 +295,7 @@ var mainState = {
         // Create an animation on the bird
         var animation = game.add.tween(this.bird);
 
-        // Set the animation to change the angle of the sprite to -20° in 100 milliseconds
+        // Set the animation to change the angle of the sprite to -20Â° in 100 milliseconds
         animation.to({ angle: -20 }, 100);
 
         // And start the animation

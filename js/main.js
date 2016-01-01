@@ -3,6 +3,8 @@
 var SCREEN_WIDTH = 500;
 var SCREEN_HEIGHT = 600;
 
+var gameCount = 0; // used to iterate background/bird colour
+
 window.onload = function () {
     document.getElementById("gameDiv").setAttribute("style", "width:" + SCREEN_WIDTH + "px;height:" + SCREEN_HEIGHT + "px; margin: 0 auto");
 }
@@ -16,11 +18,14 @@ var mainState = {
     preload: function() { 
         // This function will be executed at the beginning     
         // That's where we load the game's assets  
-        game.load.image('background', 'assets/bg.png');
+        game.load.image('background1', 'assets/bg1.png');
+        game.load.image('background2', 'assets/bg2.png');
         game.load.image('ground', 'assets/ground.png');
         game.load.image('tap', 'assets/Tap.png');
         game.load.image('getReady', 'assets/GetReady.png');
         game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 46, 3);
+        game.load.spritesheet('blueBird', 'assets/BlueBird.png', 64, 46, 3);
+        game.load.spritesheet('yellowBird', 'assets/YellowBird.png', 64, 46, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.image('gameOver', 'assets/GameOver.png');
@@ -42,8 +47,9 @@ var mainState = {
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.Arcade);
+
         // Initialize background 
-        this.background = game.add.sprite(0, 0, 'background');
+        this.background = gameCount % 2 == 0 ? game.add.sprite(0, 0, 'background1') : game.add.sprite(0, 0, 'background2');
         this.background.width = game.width;
         this.background.height = game.height;
 
@@ -72,7 +78,16 @@ var mainState = {
 
         // Display the bird on the screen
         //this.bird = this.game.add.sprite(100, 245, 'bird');
-        this.bird = this.game.add.sprite(game.world.centerX * 6/ 10, game.world.centerY, 'redBird');
+        if (gameCount % 3 == 0) {
+            this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'redBird');
+        }
+        else if (gameCount % 3 == 1) {
+            this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'blueBird');
+        }
+        else {
+            this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'yellowBird');
+        }
+
         this.bird.width = 45 * SCREEN_WIDTH / 400;
         this.bird.height = 32 * SCREEN_HEIGHT / 490;
         this.bird.anchor.setTo(-0.2, 0.5);
@@ -129,6 +144,8 @@ var mainState = {
         this.labelScore = game.add.text(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT * 1 / 6, "0", { font: "50px Dimitri", fill: "#ffffff" });
         if (localStorage.getItem('score') == null)
             localStorage.setItem('score', 0);
+
+        ++gameCount;
     },
 
     update: function() {

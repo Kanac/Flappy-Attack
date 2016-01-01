@@ -30,10 +30,10 @@ var mainState = {
         game.load.image('bronzeMedal', 'assets/BronzeMedal.png');
         game.load.image('continue', 'assets/Continue.png');
         game.load.image('share', 'assets/Share.png');
+        game.load.audio('woosh', 'assets/woosh.wav');
         game.load.audio('jump', 'assets/jump.wav');
         game.load.audio('score', 'assets/score.wav');
         game.load.audio('smack', 'assets/smack.wav');
-
     },
 
     create: function() { 
@@ -91,7 +91,8 @@ var mainState = {
         // Call the 'jump' function when the screen is tapped is hit
         //game.input.ontap(this.jump, this);
 
-        // Create jumnp second
+        // Create sounds
+        this.wooshSound = game.add.audio('woosh');
         this.jumpSound = game.add.audio('jump');
         this.scoreSound = game.add.audio('score');
         this.smackSound = game.add.audio('smack');
@@ -134,7 +135,7 @@ var mainState = {
         // This function is called 60 times per second    
         // It contains the game's logic   
         if (this.gameStart)
-            this.bird.body.gravity.y = 1250;
+            this.bird.body.gravity.y = SCREEN_HEIGHT * 2;
 
         if (this.bird.y <= this.bird.height)
             this.bird.y = this.bird.height;
@@ -251,7 +252,8 @@ var mainState = {
         game.add.tween(this.share).to({ alpha: 1 }, 300, Phaser.Easing.Linear.None, true, 300, 0, false);
     },
 
-    continueClick: function(){
+    continueClick: function () {
+        this.wooshSound.play();
         this.restartGame();
     },
 

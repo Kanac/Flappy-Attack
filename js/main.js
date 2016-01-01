@@ -23,9 +23,9 @@ var mainState = {
         game.load.image('ground', 'assets/ground.png');
         game.load.image('tap', 'assets/Tap.png');
         game.load.image('getReady', 'assets/GetReady.png');
-        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 46, 3);
-        game.load.spritesheet('blueBird', 'assets/BlueBird.png', 64, 46, 3);
-        game.load.spritesheet('yellowBird', 'assets/YellowBird.png', 64, 46, 3);
+        game.load.spritesheet('redBird', 'assets/RedBird.png', 64, 64, 3);
+        game.load.spritesheet('blueBird', 'assets/BlueBird.png', 64, 64, 3);
+        game.load.spritesheet('yellowBird', 'assets/YellowBird.png', 64, 64, 3);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.image('gameOver', 'assets/GameOver.png');
@@ -77,7 +77,6 @@ var mainState = {
         game.world.height = SCREEN_HEIGHT - SCREEN_HEIGHT * 1 / 8;
 
         // Display the bird on the screen
-        //this.bird = this.game.add.sprite(100, 245, 'bird');
         if (gameCount % 3 == 0) {
             this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'redBird');
         }
@@ -88,8 +87,8 @@ var mainState = {
             this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'yellowBird');
         }
 
-        this.bird.width = 45 * SCREEN_WIDTH / 400;
-        this.bird.height = 32 * SCREEN_HEIGHT / 490;
+        this.bird.width = 45 * SCREEN_WIDTH / 600;
+        this.bird.height = 45 * SCREEN_HEIGHT / 600;
         this.bird.anchor.setTo(-0.2, 0.5);
 
         // Add gravity to the bird to make it fall
@@ -117,27 +116,27 @@ var mainState = {
         this.pipes.enableBody = true;  // Add physics to the group  
         this.pipes.createMultiple(20, 'pipe'); // Create 20 pipes  
         this.pipes.forEach(function (p) {
-            p.width = SCREEN_WIDTH / 5;
+            p.width = SCREEN_WIDTH / 6;
             p.height = SCREEN_HEIGHT / 8;
-            p.body.setSize(SCREEN_WIDTH/5, SCREEN_HEIGHT/8, 0, 0);
+            p.body.setSize(SCREEN_WIDTH/6, SCREEN_HEIGHT/8, 0, 0);
         }, this)
 
         this.pipeHeads = game.add.group();
         this.pipeHeads.enableBody = true;
         this.pipeHeads.createMultiple(10, 'pipeHead');
         this.pipeHeads.forEach(function (p) {
-            p.width = SCREEN_WIDTH / 4;
+            p.width = SCREEN_WIDTH / 5;
             p.height = SCREEN_HEIGHT / 16;
-            p.body.setSize(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 16, 0, 0);
+            p.body.setSize(SCREEN_WIDTH / 5, SCREEN_HEIGHT / 16, 0, 0);
         }, this)
 
         // Create pipes every 1.5 seconds
-        this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
+        this.timer = game.time.events.loop(1250, this.addRowOfPipes, this);
         this.gameStart = false;
 
         // Keep track of current pipe on screen
-        this.currentPipe = null;
-        this.nextPipe = null;
+        this.currentRow = new Array();
+        this.nextRow = new Array();
 
         // Keep track of score 
         this.score = 0;
@@ -148,7 +147,7 @@ var mainState = {
         ++gameCount;
     },
 
-    update: function() {
+    update: function () {
         // This function is called 60 times per second    
         // It contains the game's logic   
         if (this.gameStart)
@@ -157,12 +156,13 @@ var mainState = {
         if (this.bird.y <= this.bird.height)
             this.bird.y = this.bird.height;
 
-        if (this.bird.y >= this.ground1.y - this.bird.height*1.5) {
+        // bird has some transparant vertical overhead, so bird.y will not match ground1.y
+        if (this.bird.y >= this.ground1.y - this.bird.width*1.2) {
             this.hitGround();
         }
         // Don't change bird angle before game starts
-        if (this.bird.angle > 0 && !this.gameStart)
-            this.bird.angle += 1
+        if (this.bird.angle > -0 && !this.gameStart)
+            this.bird.angle = 0;
         // constantly lower the bird's angle to -90 
         else if (this.bird.angle < 90 && this.gameStart) {
             this.bird.angle += 2;
@@ -177,8 +177,12 @@ var mainState = {
 
         this.checkPipes();
 
-        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this);
-        game.physics.arcade.overlap(this.bird, this.pipeHeads, this.hitPipe, null, this);
+        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, this.checkHit, this);
+        game.physics.arcade.overlap(this.bird, this.pipeHeads, this.hitPipe, this.checkHit, this);
+    },
+
+    checkHit(){
+    
     },
 
     // Stops the bird from moving once it hits ground
@@ -289,19 +293,17 @@ var mainState = {
 
     // Check when to add score after passing pipe
     checkPipes: function(){
-        if (this.currentPipe == null)
-            this.currentPipe = this.nextPipe;
-
-        if (this.currentPipe != null) {
-            if (this.bird.x >= this.currentPipe.x + this.currentPipe.width) {
-                this.currentPipe = this.nextPipe
+        if (this.currentRow.length == 0)
+            this.currentRow = this.nextRow;
+        else {
+            if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
+                this.currentRow = this.nextRow;
                 this.labelScore.text = ++this.score;
                 this.scoreSound.play();
             }
         }
     },
 
-    // Make the bird jump 
     jump: function () {
         // Set boolean to true to allow for pipes to spawn 
         if (!this.gameStart) {
@@ -312,23 +314,16 @@ var mainState = {
 
         if (this.bird.alive == false)
             return;
-        // Add a vertical velocity to the bird
-        this.bird.body.velocity.y = SCREEN_WIDTH * -7 / 8;
 
-        // Create an animation on the bird
+        this.bird.body.velocity.y = SCREEN_WIDTH * -6 / 8;
+
         var animation = game.add.tween(this.bird);
-
-        // Set the animation to change the angle of the sprite to -20° in 100 milliseconds
         animation.to({ angle: -20 }, 100);
-
-        // And start the animation
         animation.start();
 
-        // Play jump sound
         this.jumpSound.play();
     },
 
-    // Restart the game
     restartGame: function () {
         // Start the 'main' state, which restarts the game
         game.state.start('main');
@@ -342,7 +337,8 @@ var mainState = {
 
         // Set the new position of the pipe
         if (isHead)
-            pipe.reset((x - (SCREEN_WIDTH / 4 - SCREEN_WIDTH / 5)/2), y);
+            // Calculate where to place pipehead so thats its in the middle of a pipe
+            pipe.reset((x - (this.pipeHeads.getFirstDead().width - this.pipes.getFirstDead().width) / 2), y);
         else
             pipe.reset(x, y);
 
@@ -363,18 +359,21 @@ var mainState = {
         // Pick where the hole will be (number from 2 to 6)
         var hole = Math.floor(Math.random() * 5) + 2;
 
+        // Keep track of next row of pipes
+        this.nextRow = [];
+
         // Add the 5 pipes (iterate 8 times so that 2 spots are holes with 6 pipes)
         for (var i = 8; i > 1; i--) {
             if (i == hole + 2) {
                 // Place bottom pipe head
-                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true);
+                this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true));
             }
             else if (i == hole) {
                 // Place top pipe head
-                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true);
+                this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true));
             }
             else if (i != hole + 1){
-                this.nextPipe = this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false);
+                this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false));
             }
         }
     },

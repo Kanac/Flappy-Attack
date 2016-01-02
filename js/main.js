@@ -12,10 +12,10 @@ var POWERUP_HEIGHT = BIRD_HEIGHT;
 var GODMODE_DURATION = 6000;
 var BULLET_WIDTH = BIRD_WIDTH;
 var BULLET_HEIGHT = BIRD_HEIGHT;
-var MIN_POWERUP_SPAWN_TIME = 200;
-var MAX_POWERUP_SPAWN_TIME = 200;
-var MIN_BULLET_SPAWN_TIME = 4000;
-var MAX_BULLET_SPAWN_TIME = 5500;
+var MIN_POWERUP_SPAWN_TIME = 600;
+var MAX_POWERUP_SPAWN_TIME = 1000;
+var MIN_BULLET_SPAWN_TIME = 3500;
+var MAX_BULLET_SPAWN_TIME = 5000;
 var GROUND_HEIGHT = SCREEN_HEIGHT / 8;
 var PIPE_WIDTH = SCREEN_WIDTH / 6;
 var PIPE_HEIGHT = SCREEN_HEIGHT / 8;
@@ -334,7 +334,24 @@ var mainState = {
         if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
             return;
 
-        if (!this.godMode && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead" || body.sprite.key == "bullet")) {
+        if (body.sprite.key == "bullet") {
+            if (this.bird.y > body.sprite.y + body.sprite.height * 0.75 && !this.godMode) {
+                this.bird.alive = false;
+                this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
+                this.smackSound.play();
+                this.endGame();
+            }
+            else {
+                if (this.bird.y <= body.sprite.y + body.sprite.height * 0.75) {
+                    this.jump();
+                }
+                body.sprite.kill();
+                this.labelScore.text = ++this.score;
+                this.smackSound.play();
+            }
+        }
+
+        if (!this.godMode && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead")) {
             this.bird.alive = false;
             this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
             this.smackSound.play();

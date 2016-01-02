@@ -1,7 +1,17 @@
 /// <reference path="phaser.js" />
-
 var SCREEN_WIDTH = 500;
 var SCREEN_HEIGHT = 600;
+
+var MAP_VELOCITY_X = SCREEN_WIDTH / -2
+var GRAVITY_Y = SCREEN_WIDTH * 2;
+var BIRD_WIDTH = 45 * SCREEN_WIDTH / 600;
+var BIRD_HEIGHT = BIRD_WIDTH;
+var BIRD_VELOCITY_Y = SCREEN_WIDTH * -6 / 8;
+var GROUND_HEIGHT = SCREEN_HEIGHT / 8;
+var PIPE_WIDTH = SCREEN_WIDTH / 6;
+var PIPE_HEIGHT = SCREEN_HEIGHT / 8;
+var PIPE_HEAD_WIDTH = SCREEN_WIDTH / 5;
+var PIPE_HEAD_HEIGHT = SCREEN_HEIGHT / 16;
 
 var gameCount = 0; // used to iterate background/bird colour
 
@@ -54,7 +64,7 @@ var mainState = {
         game.physics.startSystem(Phaser.Physics.P2JS);
         game.physics.p2.setImpactEvents(true);
         game.physics.p2.restitution = 0;
-        game.physics.p2.gravity.y = SCREEN_WIDTH * 2;
+        game.physics.p2.gravity.y = GRAVITY_Y;
 
         this.birdCollisionGroup = game.physics.p2.createCollisionGroup();
         this.pipeCollisionGroup = game.physics.p2.createCollisionGroup();
@@ -66,15 +76,15 @@ var mainState = {
 
         this.ground1 = game.add.sprite(0, SCREEN_HEIGHT * 7 / 8, 'ground');
         this.ground1.width = SCREEN_WIDTH;
-        this.ground1.height = SCREEN_HEIGHT / 8;
+        this.ground1.height = GROUND_HEIGHT;
         game.physics.arcade.enable(this.ground1);
-        this.ground1.body.velocity.x = SCREEN_WIDTH / -2;
+        this.ground1.body.velocity.x = MAP_VELOCITY_X;
 
         this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7 / 8, 'ground');
         this.ground2.width = SCREEN_WIDTH;
-        this.ground2.height = SCREEN_HEIGHT / 8;
+        this.ground2.height = GROUND_HEIGHT;
         game.physics.arcade.enable(this.ground2);
-        this.ground2.body.velocity.x = SCREEN_WIDTH / -2;
+        this.ground2.body.velocity.x = MAP_VELOCITY_X;
 
         this.tap = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH / 3) / 2, SCREEN_HEIGHT / 2 + 15, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
@@ -95,9 +105,9 @@ var mainState = {
             this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'yellowBird');
         }
 
-        this.bird.width = 45 * SCREEN_WIDTH / 600;
-        this.bird.height = this.bird.width;
-        game.physics.p2.enable(this.bird, true);
+        this.bird.width = BIRD_WIDTH;
+        this.bird.height = BIRD_HEIGHT;
+        game.physics.p2.enable(this.bird);
         this.bird.body.data.gravityScale = 0;
         this.bird.body.data.shapes[0].sensor = true;
         this.bird.body.setCircle(this.bird.width / 2);
@@ -125,9 +135,9 @@ var mainState = {
         this.pipes = game.add.group();
         this.pipes.createMultiple(20, 'pipe');
         this.pipes.forEach(function (p) {
-            p.width = SCREEN_WIDTH / 6;
-            p.height = SCREEN_HEIGHT / 8;
-            game.physics.p2.enable(p, true);
+            p.width = PIPE_WIDTH;
+            p.height = PIPE_HEIGHT;
+            game.physics.p2.enable(p);
             p.body.data.gravityScale = 0;
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
             p.body.setCollisionGroup(this.pipeCollisionGroup);
@@ -138,9 +148,9 @@ var mainState = {
         this.pipeHeads = game.add.group();
         this.pipeHeads.createMultiple(10, 'pipeHead');
         this.pipeHeads.forEach(function (p) {
-            p.width = SCREEN_WIDTH / 5;
-            p.height = SCREEN_HEIGHT / 16;
-            game.physics.p2.enable(p, true);
+            p.width = PIPE_HEAD_WIDTH;
+            p.height = PIPE_HEAD_HEIGHT;
+            game.physics.p2.enable(p);
             p.body.data.gravityScale = 0;
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
             p.body.setCollisionGroup(this.pipeCollisionGroup);
@@ -152,9 +162,8 @@ var mainState = {
         this.timer = game.time.events.loop(1250, this.addRowOfPipes, this);
         this.gameStart = false;
 
-        // Keep track of current pipe on screen
+        // Keep track of current pipes on screen, where each index contains a pipe (chose bottom head) that represents the entire row
         this.currentRow = new Array();
-        this.nextRow = new Array();
 
         // Keep track of score 
         this.score = 0;
@@ -163,7 +172,9 @@ var mainState = {
             localStorage.setItem('score', 0);
 
         // Create Pause button
-        this.labelPause = game.add.text(SCREEN_WIDTH * 6 / 10, 15, "Pause", { font: "50px Dimitri", fill: "#ffffff" });
+        this.labelPause = game.add.text(0, 15, "Pause", { font: "50px Dimitri", fill: "#ffffff" });
+        this.labelPause.anchor.setTo(1, 0);  // Horizontal Alignment to right
+        this.labelPause.x = SCREEN_WIDTH - 15;
         this.labelPause.inputEnabled = true;
         this.labelPause.events.onInputDown.add(this.pause, this);
         // Add in ability to resume
@@ -181,7 +192,7 @@ var mainState = {
         if (this.bird.y <= this.bird.height)
             this.bird.y = this.bird.height;
 
-        // bird has some transparant vertical overhead, so bird.y will not match ground1.y
+        // bird has some transparant vertical overhead, so bird.y will not match ground1.y. Also account for anchor offset
         if (this.bird.y >= this.ground1.y - this.bird.height * 0.5) {
             this.hitGround();
         }
@@ -211,26 +222,23 @@ var mainState = {
             game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
         }
         this.gameStart = true;
-
         if (this.bird.alive == false)
             return;
 
-        this.bird.body.velocity.y = SCREEN_WIDTH * -6 / 8;
-
+        this.bird.body.velocity.y = BIRD_VELOCITY_Y;
         var animation = game.add.tween(this.bird);
         animation.to({ angle: -40 }, 100);
         animation.start();
-
         this.jumpSound.play();
     },
 
     // Check when to add score after passing pipe
     checkPipes: function () {
         if (this.currentRow.length == 0)
-            this.currentRow = this.nextRow;
+            return;
         else {
             if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
-                this.currentRow = this.nextRow;
+                this.currentRow.splice(0, 1);   // Delete first index of array 
                 this.labelScore.text = ++this.score;
                 this.scoreSound.play();
             }
@@ -238,9 +246,10 @@ var mainState = {
     },
 
     pause: function (item) {
-        game.paused = true;
-        this.labelPause.text = "Resume";
-
+        if (this.bird.alive) {
+            game.paused = true;
+            this.labelPause.text = "Resume";
+        }
     },
 
     resume: function (event) {
@@ -255,6 +264,7 @@ var mainState = {
         if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
             return;
 
+        this.bird.alive = false;
         this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
         this.smackSound.play();
         this.endGame();
@@ -279,7 +289,6 @@ var mainState = {
         game.world.bringToTop(this.bird);
         game.world.bringToTop(this.ground1);
         game.world.bringToTop(this.ground2);
-
         game.time.events.remove(this.timer);
 
         this.pipes.forEachAlive(function (p) {
@@ -288,6 +297,7 @@ var mainState = {
         this.pipeHeads.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
+
         this.ground1.body.velocity.x = 0;
         this.ground2.body.velocity.x = 0;
 
@@ -370,7 +380,6 @@ var mainState = {
         // Get the first dead pipe of our group
         var pipe = isHead ? this.pipeHeads.getFirstDead() : this.pipes.getFirstDead();
         pipe.anchor.setTo(0);
-        //pipe.body.setRectangle(pipe.width, pipe.height, 0.5 * pipe.width,  0.5 * pipe.height);
 
         // Set the new position of the pipe
         if (isHead)
@@ -380,12 +389,11 @@ var mainState = {
             pipe.reset(x, y);
 
         // Add velocity to the pipe to make it move left
-        pipe.body.velocity.x = SCREEN_WIDTH / -2;
+        pipe.body.velocity.x = MAP_VELOCITY_X;
 
         // Kill the pipe when it's no longer visible 
         pipe.checkWorldBounds = true;
         pipe.outOfBoundsKill = true;
-
         return pipe;
     },
 
@@ -396,22 +404,19 @@ var mainState = {
         // Pick where the hole will be (number from 2 to 6)
         var hole = Math.floor(Math.random() * 5) + 2;
 
-        // Keep track of next row of pipes
-        this.nextRow = [];
-
-        // Add the 5 pipes (iterate 8 times so that 2 spots are holes with 6 pipes)
+        // Add the 5 pipes (iterate 7 times so that 2 spots are holes with 5 pipes)
         for (var i = 8; i > 1; i--) {
             if (i == hole + 2) {
-                // Place bottom pipe head
-                this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true));
+                // Place bottom pipe head and choose this pipe to keep track of to represent the row for scoring
+                // Y calculation means take the current step size away from the ground and account for anchor offset to place it level with previous pipe
+                this.currentRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true));
             }
             else if (i == hole) {
                 // Place top pipe head
-                this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true));
+                this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true);
             }
-            else
-                if (i != hole + 1) {
-                    this.nextRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false));
+            else if (i != hole + 1) {
+                this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false);
                 }
         }
     },

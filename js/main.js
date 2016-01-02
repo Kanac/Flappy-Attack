@@ -12,8 +12,8 @@ var POWERUP_HEIGHT = BIRD_HEIGHT;
 var GODMODE_DURATION = 6000;
 var BULLET_WIDTH = BIRD_WIDTH;
 var BULLET_HEIGHT = BIRD_HEIGHT;
-var MIN_POWERUP_SPAWN_TIME = 600;
-var MAX_POWERUP_SPAWN_TIME = 1000;
+var MIN_POWERUP_SPAWN_TIME = 200;
+var MAX_POWERUP_SPAWN_TIME = 200;
 var MIN_BULLET_SPAWN_TIME = 4000;
 var MAX_BULLET_SPAWN_TIME = 5500;
 var GROUND_HEIGHT = SCREEN_HEIGHT / 8;
@@ -75,7 +75,6 @@ var mainState = {
 
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.P2JS);
-        game.physics.p2.setImpactEvents(true);
         game.physics.p2.gravity.y = GRAVITY_Y;
 
         // Assign the physics interaction groups 
@@ -100,6 +99,8 @@ var mainState = {
         this.ground2.height = GROUND_HEIGHT;
         game.physics.arcade.enable(this.ground2);
         this.ground2.body.velocity.x = MAP_VELOCITY_X;
+
+        this.world.height = SCREEN_WIDTH * 7 / 8;
 
         this.tap = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH / 3) / 2, SCREEN_HEIGHT * 4.5 / 10, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
@@ -180,8 +181,8 @@ var mainState = {
 
         // Create power ups
         this.powerUps = game.add.group();
-        this.powerUps.createMultiple(6, 'bonusPoints');
-        this.powerUps.createMultiple(3, 'godMode');
+        this.powerUps.createMultiple(10, 'bonusPoints');
+        this.powerUps.createMultiple(5, 'godMode');
         this.powerUps.forEach(function (p) {
             p.width = POWERUP_WIDTH;
             p.height = POWERUP_HEIGHT;
@@ -194,10 +195,14 @@ var mainState = {
         }, this)
 
         // Add in random bonus point spawner and emitter effect
-        this.timerPowerUp = game.time.events.loop(game.rnd.integerInRange(MIN_POWERUP_SPAWN_TIME, MAX_POWERUP_SPAWN_TIME), this.addPowerUp, this);
+        this.timerPowerUp = game.time.events.add(game.rnd.integerInRange(MIN_POWERUP_SPAWN_TIME, MAX_POWERUP_SPAWN_TIME) + PIPE_SPAWN_TIME, this.addPowerUp, this);
         this.emitter = game.add.emitter(0, 0, 100);
         this.emitter.makeParticles('bonusPoints');
         this.emitter.gravity = GRAVITY_Y;
+
+        this.emitterGod = game.add.emitter(0, 0, 100);
+        this.emitterGod.makeParticles('godMode');
+        this.emitterGod.gravity = GRAVITY_Y;
 
         // Create bullet enemies 
         this.bullets = game.add.group();
@@ -213,7 +218,7 @@ var mainState = {
             p.body.static = true;
         }, this)
 
-        this.timerBullet = game.time.events.loop(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet, this);
+        this.timerBullet = game.time.events.add(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet, this);
 
         // Keep track of current pipes on screen, where each index contains a pipe (chose bottom head) that represents the entire row
         this.currentRow = new Array();
@@ -242,9 +247,6 @@ var mainState = {
 
     update: function () {
         // This function is called 60 times per second    
-        if (this.gameStart)
-            this.bird.body.data.gravityScale = 1;
-
         if (this.bird.y <= this.bird.height * 0.5)
             this.bird.body.moveDown(10);
 
@@ -278,12 +280,22 @@ var mainState = {
         if (!this.gameStart) {
             game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
             game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
+            this.bird.body.data.gravityScale = 1;
         }
-        this.gameStart = true;
+
         if (this.bird.alive == false)
             return;
 
+        this.gameStart = true;
         this.bird.body.velocity.y = BIRD_VELOCITY_Y;
+
+        if (this.godMode) {
+            this.emitterGod.x = this.bird.x;
+            this.emitterGod.y = this.bird.y;
+            this.emitterGod.setXSpeed(0.5* MAP_VELOCITY_X, 1 * MAP_VELOCITY_X);
+            this.emitterGod.start(true, 1500, null, 10);
+        }
+
         var animation = game.add.tween(this.bird);
         animation.to({ angle: -40 }, 100);
         animation.start();
@@ -323,7 +335,6 @@ var mainState = {
             return;
 
         if (!this.godMode && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead" || body.sprite.key == "bullet")) {
-            this.bird.body.velocity.x = 0;
             this.bird.alive = false;
             this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
             this.smackSound.play();
@@ -352,15 +363,17 @@ var mainState = {
 
     // Stops the bird from moving once it hits ground
     hitGround: function () {
-        if (!this.bird.alive || this.godMode)
+        if (this.godMode)
             return;
 
+        // Stop all movement first if falling from pipe
         this.bird.body.velocity.y = 0;
         this.bird.body.data.gravityScale = 0;
-        if (this.bird.alive) {  // If alive still, means it did not die from pipe, so finish up the work
-            this.smackSound.play();
+
+        // If dying from ground hit, finish off the game
+        if (this.bird.alive) {
             this.bird.alive = false;
-            this.bird.bringToTop();
+            this.smackSound.play();
             this.endGame();
         }
     },
@@ -368,10 +381,6 @@ var mainState = {
     // Stops everything in the game
     endGame: function () {
         this.bird.alive = false;
-
-        game.world.bringToTop(this.bird);
-        game.world.bringToTop(this.ground1);
-        game.world.bringToTop(this.ground2);
         game.time.events.remove(this.timerPipe);
         game.time.events.remove(this.timerPowerUp);
         game.time.events.remove(this.timerBullet);
@@ -513,14 +522,10 @@ var mainState = {
 
     addPowerUp: function () {
         // Change delay of next power up spawn
-        this.timerPowerUp.delay = game.rnd.integerInRange(MIN_POWERUP_SPAWN_TIME, MAX_POWERUP_SPAWN_TIME);
+        this.timerPowerUp = game.time.events.add(game.rnd.integerInRange(MIN_POWERUP_SPAWN_TIME, MAX_POWERUP_SPAWN_TIME), this.addPowerUp, this);
 
         // Ensure game has started and that there are no pipes near this power up 
         if (!this.gameStart)
-            return;
-
-        // Don't spawn in the interval between game start and first pipe. May collide with a pipe. 
-        if (this.currentRow.length == 0)
             return;
 
         if (this.currentRow.length > 0) {
@@ -537,15 +542,16 @@ var mainState = {
         // Pick random y value above ground
         var randY = Math.floor(Math.random() * SCREEN_WIDTH * 6 / 8);
 
+        powerUp.bringToTop();
         powerUp.anchor.setTo(0, 0);
-        powerUp.reset(SCREEN_WIDTH, randY);
+        powerUp.reset(SCREEN_WIDTH, (game.rnd.integerInRange(SCREEN_WIDTH*1/8, SCREEN_WIDTH*6/8)));
         powerUp.body.velocity.x = MAP_VELOCITY_X;
         powerUp.checkWorldBounds = true;
         powerUp.outOfBoundsKill = true;
     },
 
     addBullet: function () {
-        this.timerPowerUp.delay = game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME);
+        this.timerPowerUp = game.time.events.add(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet ,this);
         if (!this.gameStart)
             return;
 

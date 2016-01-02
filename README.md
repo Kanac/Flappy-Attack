@@ -3,4 +3,4 @@ A Web App that will first reverse engineer Flappy Bird then add in my own featur
 
 The work in progress can be viewed at http://kanac.github.io/Flappy-Bird/
 
-The original project that was used as a scaffold for this project can be found at http://www.lessmilk.com/flappy_bird/01/ and I have since significantly modified the game.  
+The original project that I used to learn Javascript as well as the Phaser engine can be found at http://www.lessmilk.com/flappy_bird/01/. Using this tutorial as a scaffold, I have since significantly modified the game.  

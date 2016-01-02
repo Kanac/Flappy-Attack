@@ -12,7 +12,7 @@ var POWERUP_HEIGHT = BIRD_HEIGHT;
 var GODMODE_DURATION = 6000;
 var BULLET_WIDTH = BIRD_WIDTH;
 var BULLET_HEIGHT = BIRD_HEIGHT;
-var MIN_POWERUP_SPAWN_TIME = 700;
+var MIN_POWERUP_SPAWN_TIME = 600;
 var MAX_POWERUP_SPAWN_TIME = 1000;
 var MIN_BULLET_SPAWN_TIME = 4000;
 var MAX_BULLET_SPAWN_TIME = 5500;
@@ -21,6 +21,7 @@ var PIPE_WIDTH = SCREEN_WIDTH / 6;
 var PIPE_HEIGHT = SCREEN_HEIGHT / 8;
 var PIPE_HEAD_WIDTH = SCREEN_WIDTH / 5;
 var PIPE_HEAD_HEIGHT = SCREEN_HEIGHT / 16;
+var PIPE_SPAWN_TIME = 1250;
 
 var gameCount = 0; // used to iterate background/bird colour
 
@@ -175,7 +176,7 @@ var mainState = {
         }, this)
 
         // Create pipes every 1.25 seconds
-        this.timerPipe = game.time.events.loop(1250, this.addRowOfPipes, this);
+        this.timerPipe = game.time.events.loop(PIPE_SPAWN_TIME, this.addRowOfPipes, this);
 
         // Create power ups
         this.powerUps = game.add.group();
@@ -250,7 +251,7 @@ var mainState = {
         if (this.bird.y >= this.ground1.y - this.bird.height * 0.5) {
             if (this.godMode) {
                 // Set to a high number to fight back gravity, otherwise bird will get stuck
-                this.bird.body.moveUp(100);  
+                this.bird.body.moveUp(100);
             }
             else
                 this.hitGround();
@@ -321,7 +322,7 @@ var mainState = {
         if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
             return;
 
-        if (!this.godMode && ( body.sprite.key == "pipe" || body.sprite.key == "pipeHead" || body.sprite.key == "bullet")) {
+        if (!this.godMode && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead" || body.sprite.key == "bullet")) {
             this.bird.body.velocity.x = 0;
             this.bird.alive = false;
             this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
@@ -351,7 +352,7 @@ var mainState = {
 
     // Stops the bird from moving once it hits ground
     hitGround: function () {
-        if (!this.bird.alive || this.godMode)  
+        if (!this.bird.alive || this.godMode)
             return;
 
         this.bird.body.velocity.y = 0;
@@ -492,18 +493,20 @@ var mainState = {
         var hole = Math.floor(Math.random() * 5) + 2;
 
         // Add the 5 pipes (iterate 7 times so that 2 spots are holes with 5 pipes)
+        // All calculations done with the fact that anchor is 0,0 (top left)
         for (var i = 8; i > 1; i--) {
             if (i == hole + 2) {
                 // Place bottom pipe head and choose this pipe to keep track of to represent the row for scoring
                 // Y calculation means take the current step size away from the ground and account for anchor offset to place it level with previous pipe
-                this.currentRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8) + (SCREEN_HEIGHT / 8 - SCREEN_HEIGHT / 16), true));
+                this.currentRow.push(this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (GROUND_HEIGHT + PIPE_HEIGHT) + (PIPE_HEIGHT - PIPE_HEAD_HEIGHT), true));
             }
             else if (i == hole) {
-                // Place top pipe head
-                this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), true);
+                // Place top pipe head (normal calculation since using empty hole area)
+                this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (GROUND_HEIGHT + PIPE_HEIGHT), true);
             }
             else if (i != hole + 1) {
-                this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (2 * SCREEN_HEIGHT / 8), false);
+                // Normal pipe calculation 
+                this.addOnePipe(SCREEN_WIDTH, i * SCREEN_HEIGHT / 8 - (GROUND_HEIGHT + PIPE_HEIGHT), false);
             }
         }
     },
@@ -522,9 +525,10 @@ var mainState = {
 
         if (this.currentRow.length > 0) {
             var frontPipe = this.currentRow[this.currentRow.length - 1];
-            if (frontPipe.x >= SCREEN_WIDTH - frontPipe.width || frontPipe.x <= SCREEN_WIDTH * 5.1 / 8) 
+            // Don't place a power up inside a pipe
+            if (frontPipe.x >= SCREEN_WIDTH - frontPipe.width || frontPipe.x <= SCREEN_WIDTH * 5.1 / 8)
                 return;
-       }
+        }
 
         do {
             var powerUp = this.powerUps.getRandom();
@@ -557,8 +561,6 @@ var mainState = {
         bullet.checkWorldBounds = true;
         bullet.outOfBoundsKill = true;
         this.boomSound.play();
-
-
     }
 };
 

@@ -12,10 +12,14 @@ var POWERUP_HEIGHT = BIRD_HEIGHT;
 var GODMODE_DURATION = 6000;
 var BULLET_WIDTH = BIRD_WIDTH;
 var BULLET_HEIGHT = BIRD_HEIGHT;
-var MIN_POWERUP_SPAWN_TIME = 600;
-var MAX_POWERUP_SPAWN_TIME = 1000;
-var MIN_BULLET_SPAWN_TIME = 3500;
-var MAX_BULLET_SPAWN_TIME = 5000;
+//var MIN_POWERUP_SPAWN_TIME = 600;
+//var MAX_POWERUP_SPAWN_TIME = 1000;
+//var MIN_BULLET_SPAWN_TIME = 3500;
+//var MAX_BULLET_SPAWN_TIME = 5000;
+var MIN_POWERUP_SPAWN_TIME = 300;
+var MAX_POWERUP_SPAWN_TIME = 300;
+var MIN_BULLET_SPAWN_TIME = 500;
+var MAX_BULLET_SPAWN_TIME = 600;
 var GROUND_HEIGHT = SCREEN_HEIGHT / 8;
 var PIPE_WIDTH = SCREEN_WIDTH / 6;
 var PIPE_HEIGHT = SCREEN_HEIGHT / 8;
@@ -51,7 +55,7 @@ var mainState = {
         game.load.spritesheet('yellowBird', 'assets/YellowBird.png', 64, 64, 3);
         game.load.image('bonusPoints', 'assets/BonusPoints.png');
         game.load.image('godMode', 'assets/GodMode.png');
-        game.load.image('bullet', 'assets/Bullet.png');
+        game.load.spritesheet('bullet', 'assets/BulletBoth.png', 68, 69, 2);
         game.load.image('pipe', 'assets/MiddlePipe.png');
         game.load.image('pipeHead', 'assets/EndPipe.png');
         game.load.image('gameOver', 'assets/GameOver.png');
@@ -156,7 +160,6 @@ var mainState = {
             p.width = PIPE_WIDTH;
             p.height = PIPE_HEIGHT;
             game.physics.p2.enable(p);
-            p.body.data.gravityScale = 0;
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
             p.body.setCollisionGroup(this.pipeCollisionGroup);
             p.body.collides(this.birdCollisionGroup);
@@ -169,13 +172,14 @@ var mainState = {
             p.width = PIPE_HEAD_WIDTH;
             p.height = PIPE_HEAD_HEIGHT;
             game.physics.p2.enable(p);
-            p.body.data.gravityScale = 0;
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
             p.body.setCollisionGroup(this.pipeCollisionGroup);
             p.body.collides(this.birdCollisionGroup);
             p.body.static = true;
         }, this)
 
+        // Keep track of current pipes on screen, where each index contains a pipe (chose bottom head) that represents the entire row
+        this.currentRow = new Array();
         // Create pipes every 1.25 seconds
         this.timerPipe = game.time.events.loop(PIPE_SPAWN_TIME, this.addRowOfPipes, this);
 
@@ -187,7 +191,6 @@ var mainState = {
             p.width = POWERUP_WIDTH;
             p.height = POWERUP_HEIGHT;
             game.physics.p2.enable(p);
-            p.body.data.gravityScale = 0;
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
             p.body.setCollisionGroup(this.powerUpCollisionGroup);
             p.body.collides(this.birdCollisionGroup);
@@ -213,15 +216,13 @@ var mainState = {
             game.physics.p2.enable(p);
             p.body.data.gravityScale = 0;
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
+            p.body.data.shapes[0].sensor = true;
             p.body.setCollisionGroup(this.bulletCollisionGroup);
             p.body.collides(this.birdCollisionGroup);
-            p.body.static = true;
+            p.body.fixedRotation = true;
         }, this)
 
         this.timerBullet = game.time.events.add(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet, this);
-
-        // Keep track of current pipes on screen, where each index contains a pipe (chose bottom head) that represents the entire row
-        this.currentRow = new Array();
 
         // Keep track of score 
         this.score = 0;
@@ -335,17 +336,18 @@ var mainState = {
             return;
 
         if (body.sprite.key == "bullet") {
-            if (this.bird.y > body.sprite.y + body.sprite.height * 0.75 && !this.godMode) {
+            if (this.bird.y > body.sprite.y + body.sprite.height && !this.godMode) {
                 this.bird.alive = false;
                 this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
                 this.smackSound.play();
                 this.endGame();
             }
             else {
-                if (this.bird.y <= body.sprite.y + body.sprite.height * 0.75) {
+                if (this.bird.y <= body.sprite.y + body.sprite.height ) {
                     this.jump();
                 }
-                body.sprite.kill();
+                body.sprite.body.velocity.y = BIRD_VELOCITY_Y * -2;
+                body.sprite.frame = 1;
                 this.labelScore.text = ++this.score;
                 this.smackSound.play();
             }
@@ -398,9 +400,9 @@ var mainState = {
     // Stops everything in the game
     endGame: function () {
         this.bird.alive = false;
-        game.time.events.remove(this.timerPipe);
-        game.time.events.remove(this.timerPowerUp);
-        game.time.events.remove(this.timerBullet);
+        game.time.events.removeAll(this.timerPipe);
+        game.time.events.removeAll(this.timerPowerUp);
+        game.time.events.removeAll(this.timerBullet);
 
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;
@@ -409,6 +411,9 @@ var mainState = {
             p.body.velocity.x = 0;
         }, this);
         this.powerUps.forEachAlive(function (p) {
+            p.body.velocity.x = 0;
+        }, this);
+        this.bullets.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
 
@@ -578,6 +583,7 @@ var mainState = {
         var randVelocity = (Math.random() * 1) + 1.5
 
         var bullet = this.bullets.getFirstDead();
+        bullet.frame = 0;
         bullet.anchor.setTo(0, 0);
         bullet.reset(SCREEN_WIDTH, randY);
         bullet.body.velocity.x = randVelocity * MAP_VELOCITY_X;

@@ -14,7 +14,7 @@ var BULLET_WIDTH = BIRD_WIDTH;
 var BULLET_HEIGHT = BIRD_HEIGHT;
 var MIN_POWERUP_SPAWN_TIME = 600;
 var MAX_POWERUP_SPAWN_TIME = 1000;
-var MIN_BULLET_SPAWN_TIME = 3500;
+var MIN_BULLET_SPAWN_TIME = 2500;
 var MAX_BULLET_SPAWN_TIME = 5000;
 //var MIN_POWERUP_SPAWN_TIME = 300;
 //var MAX_POWERUP_SPAWN_TIME = 300;
@@ -74,9 +74,6 @@ var mainState = {
     },
 
     create: function () {
-        // This function is called after the preload function     
-        // Here we set up the game, display sprites, etc.  
-
         // Set the physics system
         game.physics.startSystem(Phaser.Physics.P2JS);
         game.physics.p2.gravity.y = GRAVITY_Y;
@@ -86,44 +83,51 @@ var mainState = {
         this.pipeCollisionGroup = game.physics.p2.createCollisionGroup();
         this.powerUpCollisionGroup = game.physics.p2.createCollisionGroup();
         this.bulletCollisionGroup = game.physics.p2.createCollisionGroup();
+        this.groundCollisionGroup = game.physics.p2.createCollisionGroup();
+
+        game.physics.p2.updateBoundsCollisionGroup();
 
         // Initialize background 
         this.background = gameCount % 2 == 0 ? game.add.sprite(0, 0, 'background1') : game.add.sprite(0, 0, 'background2');
         this.background.width = game.width;
         this.background.height = game.height;
 
+        // Iniitalize ground
         this.ground = game.add.tileSprite(0, SCREEN_HEIGHT * 7 / 8, SCREEN_WIDTH, GROUND_HEIGHT, "ground");
-        this.world.height = SCREEN_WIDTH * 7 / 8;
+        game.physics.p2.enable(this.ground);
+        this.ground.anchor.setTo(0);
+        this.ground.body.setRectangle(this.ground.width, this.ground.height, this.ground.width * 0.5, this.ground.height * 0.5);
+        this.ground.body.setCollisionGroup(this.groundCollisionGroup);
+        this.ground.body.collides([this.birdCollisionGroup]);
+        this.ground.body.data.gravityScale = 0;
 
+        // Initialize start UI
         this.tap = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH / 3) / 2, SCREEN_HEIGHT * 4.5 / 10, 'tap');
         this.tap.width = SCREEN_WIDTH * 1 / 3;
         this.tap.height = SCREEN_HEIGHT * 2 / 10;
-
         this.getReady = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH * 2 / 3) / 2, SCREEN_HEIGHT * 2.5 / 10 + 15, 'getReady');
         this.getReady.width = SCREEN_WIDTH * 2 / 3;
         this.getReady.height = SCREEN_HEIGHT * 1 / 8;
 
         // Display the bird on the screen
-        if (gameCount % 3 == 0) {
+        if (gameCount % 3 == 0)
             this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'redBird');
-        }
-        else if (gameCount % 3 == 1) {
+        else if (gameCount % 3 == 1)
             this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'blueBird');
-        }
-        else {
+        else
             this.bird = this.game.add.sprite(game.world.centerX * 6 / 10, game.world.centerY, 'yellowBird');
-        }
 
+        // Set bird physics and properties
         this.bird.width = BIRD_WIDTH;
         this.bird.height = BIRD_HEIGHT;
         game.physics.p2.enable(this.bird);
         this.bird.body.data.gravityScale = 0;
         this.bird.body.setCircle(this.bird.width / 2);
-        this.bird.body.data.shapes[0].sensor = true;   // Set sensor after body shape is set 
+        this.bird.body.data.shapes[0].sensor = true;   // Set sensor (meaning no physics but still check) after body shape is set 
         this.bird.body.fixedRotation = true;
         this.bird.body.setCollisionGroup(this.birdCollisionGroup);
         this.bird.body.onBeginContact.add(this.hitObject, this);
-        this.bird.body.collides([this.pipeCollisionGroup, this.powerUpCollisionGroup, this.bulletCollisionGroup]);
+        this.bird.body.collides([this.pipeCollisionGroup, this.powerUpCollisionGroup, this.bulletCollisionGroup, this.groundCollisionGroup]);
         var flap = this.bird.animations.add('flap');
         this.bird.animations.play('flap', 10, true);
 
@@ -175,7 +179,7 @@ var mainState = {
             p.body.static = true;
         }, this)
 
-        // Add in random bonus point spawner and emitter effect
+        // Add in random bonus point and godmode spawner and emitter effect
         this.timerPowerUp = game.time.events.add(game.rnd.integerInRange(MIN_POWERUP_SPAWN_TIME, MAX_POWERUP_SPAWN_TIME) + PIPE_SPAWN_TIME, this.addPowerUp, this);
         this.emitter = game.add.emitter(0, 0, 100);
         this.emitter.makeParticles('bonusPoints');
@@ -197,7 +201,7 @@ var mainState = {
             p.body.data.shapes[0].sensor = true;
             p.body.setCollisionGroup(this.bulletCollisionGroup);
             p.body.collides(this.birdCollisionGroup);
-            p.body.fixedRotation = true;
+            p.body.static = true;
         }, this)
 
         this.timerBullet = game.time.events.add(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet, this);
@@ -219,31 +223,19 @@ var mainState = {
         game.input.onDown.add(this.resume, this);
 
         this.gameStart = false;
+        this.gameOver = false;  // Use a boolean before signalling bird.alive (will change properties)
         this.godMode = false;
         ++gameCount;
     },
 
-
+    // This function is called 60 times per second    
     update: function () {
-        // This function is called 60 times per second    
-        if (this.bird.y <= this.bird.height * 0.5)
-            this.bird.body.moveDown(10);
-
-        if (this.bird.y >= this.ground.y - this.bird.height * 0.5) {
-            if (this.godMode) {
-                // Set to a high number to fight back gravity, otherwise bird will get stuck
-                this.bird.body.moveUp(100);
-            }
-            else
-                this.hitGround();
-        }
         // Don't change bird angle before game starts
-        if (this.bird.angle > -0 && !this.gameStart) {
+        if (this.bird.angle > -0 && !this.gameStart)
             this.bird.angle = 0;
-        } // Constantly lower the bird's angle to -90 
-        else if (this.bird.angle < 90 && this.gameStart) {
+            // Constantly lower the bird's angle to -90 
+        else if (this.bird.angle < 90 && this.gameStart)
             this.bird.angle += 2;
-        }
 
         if (this.bird.alive)
             this.ground.tilePosition.x += MAP_VELOCITY_X / 60;
@@ -267,7 +259,7 @@ var mainState = {
         if (this.godMode) {
             this.emitterGod.x = this.bird.x;
             this.emitterGod.y = this.bird.y;
-            this.emitterGod.setXSpeed(0.5* MAP_VELOCITY_X, 1 * MAP_VELOCITY_X);
+            this.emitterGod.setXSpeed(0.5 * MAP_VELOCITY_X, 1 * MAP_VELOCITY_X);
             this.emitterGod.start(true, 1500, null, 10);
         }
 
@@ -308,16 +300,29 @@ var mainState = {
     hitObject: function (body, bodyB, shapeA, shapeB, equation) {
         if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
             return;
+        if (body == null) {
+            if (this.bird.y <= this.bird.height * 0.5) {
+                this.bird.body.moveDown(10);
+            }
+        }
 
-        if (body.sprite.key == "bullet") {
-            if (this.bird.y > body.sprite.y + body.sprite.height && !this.godMode) {
-                this.bird.alive = false;
-                this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
+        else if (body.sprite.key == "ground") {
+            if (this.godMode)
+                // Set to a high number to fight back gravity, otherwise bird will get stuck
+                this.bird.body.moveUp(200);
+            else
+                this.hitGround();
+        }
+
+        else if (body.sprite.key == "bullet") {
+            // Check if bullet kills bird (bird didn't jump on it or no god mode on)
+            if (this.bird.y > body.sprite.y + body.sprite.height * 0.2 && !this.godMode) {
+                this.gameOver = true;
                 this.smackSound.play();
                 this.endGame();
             }
             else {
-                if (this.bird.y <= body.sprite.y + body.sprite.height ) {
+                if (this.bird.y <= body.sprite.y + body.sprite.height * 0.2) {
                     this.jump();
                 }
                 body.sprite.body.velocity.y = BIRD_VELOCITY_Y * -2;
@@ -327,9 +332,8 @@ var mainState = {
             }
         }
 
-        if (!this.godMode && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead")) {
-            this.bird.alive = false;
-            this.bird.body.setRectangle(0, 0);   // Let the bird fall through pipes to hit the ground
+        else if (!this.godMode && !this.gameOver && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead")) {
+            this.gameOver = true;
             this.smackSound.play();
             this.endGame();
         }
@@ -359,13 +363,13 @@ var mainState = {
         if (this.godMode)
             return;
 
-        // Stop all movement first if falling from pipe
+        // Stop all movement at this point
         this.bird.body.velocity.y = 0;
         this.bird.body.data.gravityScale = 0;
-
+        this.bird.body.static = true;
+        this.bird.alive = false
         // If dying from ground hit, finish off the game
-        if (this.bird.alive) {
-            this.bird.alive = false;
+        if (!this.gameOver) {
             this.smackSound.play();
             this.endGame();
         }
@@ -373,7 +377,6 @@ var mainState = {
 
     // Stops everything in the game
     endGame: function () {
-        this.bird.alive = false;
         game.time.events.removeAll(this.timerPipe);
         game.time.events.removeAll(this.timerPowerUp);
         game.time.events.removeAll(this.timerBullet);
@@ -464,7 +467,6 @@ var mainState = {
     },
 
     addOnePipe: function (x, y, isHead) {
-        // Get the first dead pipe of our group
         do {
             var pipe = this.pipes.getRandom();
         } while (!((pipe.key == "pipeHead" && isHead) || (pipe.key == "pipe" && !isHead)) || pipe.alive)
@@ -479,7 +481,6 @@ var mainState = {
         else
             pipe.reset(x, y);
 
-        // Add velocity to the pipe to make it move left
         pipe.body.velocity.x = MAP_VELOCITY_X;
 
         // Kill the pipe when it's no longer visible 
@@ -538,14 +539,14 @@ var mainState = {
 
         powerUp.bringToTop();
         powerUp.anchor.setTo(0, 0);
-        powerUp.reset(SCREEN_WIDTH, (game.rnd.integerInRange(SCREEN_WIDTH*1/8, SCREEN_WIDTH*6/8)));
+        powerUp.reset(SCREEN_WIDTH, (game.rnd.integerInRange(SCREEN_WIDTH * 1 / 8, SCREEN_WIDTH * 6 / 8)));
         powerUp.body.velocity.x = MAP_VELOCITY_X;
         powerUp.checkWorldBounds = true;
         powerUp.outOfBoundsKill = true;
     },
 
     addBullet: function () {
-        this.timerPowerUp = game.time.events.add(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet ,this);
+        this.timerPowerUp = game.time.events.add(game.rnd.integerInRange(MIN_BULLET_SPAWN_TIME, MAX_BULLET_SPAWN_TIME), this.addBullet, this);
         if (!this.gameStart)
             return;
 

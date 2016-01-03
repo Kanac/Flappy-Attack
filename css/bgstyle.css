@@ -2,8 +2,15 @@
  background-color: #292929
 }
 
+.fontPreload{
+    position:absolute;
+    left:-100px;
+}
+
 @font-face {
   font-family: "Dimitri";
-  src: url('../assets/DIMITRI_.TTF')
+  src: url('../assets/DIMITRI_.eot') format('eot'),
+       url('../assets/DIMITRI_.ttf') format('truetype'),
+           url('../assets/DIMITRI_.woff') format('woff');
 }
 

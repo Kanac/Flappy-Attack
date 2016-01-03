@@ -1,6 +1,8 @@
-/// <reference path="phaser.js" />
+/// <reference path="phaser.min.js" />
 var SCREEN_WIDTH = 500;
 var SCREEN_HEIGHT = 600;
+//var SCREEN_WIDTH = window.innerWidth;
+//var SCREEN_HEIGHT = window.innerHeight;
 
 var MAP_VELOCITY_X = SCREEN_WIDTH / -2
 var GRAVITY_Y = SCREEN_HEIGHT * 2;
@@ -65,12 +67,12 @@ var mainState = {
         game.load.image('bronzeMedal', 'assets/BronzeMedal.png');
         game.load.image('continue', 'assets/Continue.png');
         game.load.image('share', 'assets/Share.png');
-        game.load.audio('godModeSong', 'assets/GodModeSong.wav');
-        game.load.audio('woosh', 'assets/woosh.wav');
-        game.load.audio('jump', 'assets/jump.wav');
-        game.load.audio('score', 'assets/score.wav');
-        game.load.audio('smack', 'assets/smack.wav');
-        game.load.audio('boom', 'assets/boom.wav');
+        game.load.audio('godModeSong', 'assets/GodModeSong.mp3');
+        game.load.audio('woosh', 'assets/woosh.mp3');
+        game.load.audio('jump', 'assets/jump.mp3');
+        game.load.audio('score', 'assets/score.mp3');
+        game.load.audio('smack', 'assets/smack.mp3');
+        game.load.audio('boom', 'assets/boom.mp3');
     },
 
     create: function () {

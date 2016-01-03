@@ -223,7 +223,7 @@ var mainState = {
         game.input.onDown.add(this.resume, this);
 
         this.gameStart = false;
-        this.gameOver = false;  // Use a boolean before signalling bird.alive (will change properties)
+        this.alive = true;  // Use a boolean before signalling bird.alive (will change properties)
         this.godMode = false;
         ++gameCount;
     },
@@ -237,7 +237,7 @@ var mainState = {
         else if (this.bird.angle < 90 && this.gameStart)
             this.bird.angle += 2;
 
-        if (this.bird.alive)
+        if (this.alive)
             this.ground.tilePosition.x += MAP_VELOCITY_X / 60;
 
         this.checkPipes();
@@ -250,7 +250,7 @@ var mainState = {
             this.bird.body.data.gravityScale = 1;
         }
 
-        if (this.bird.alive == false)
+        if (!this.alive)
             return;
 
         this.gameStart = true;
@@ -300,10 +300,9 @@ var mainState = {
     hitObject: function (body, bodyB, shapeA, shapeB, equation) {
         if (!this.bird.alive)  // Don't play smack sound again if already hit pipe
             return;
+
         if (body == null) {
-            if (this.bird.y <= this.bird.height * 0.5) {
-                this.bird.body.moveDown(10);
-            }
+            this.bird.body.moveDown(25);
         }
 
         else if (body.sprite.key == "ground") {
@@ -317,8 +316,9 @@ var mainState = {
         else if (body.sprite.key == "bullet") {
             // Check if bullet kills bird (bird didn't jump on it or no god mode on)
             if (this.bird.y > body.sprite.y + body.sprite.height * 0.2 && !this.godMode) {
-                this.gameOver = true;
+                this.alive = false;
                 this.smackSound.play();
+                this.bird.bringToTop();
                 this.endGame();
             }
             else {
@@ -332,8 +332,9 @@ var mainState = {
             }
         }
 
-        else if (!this.godMode && !this.gameOver && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead")) {
-            this.gameOver = true;
+        else if (!this.godMode && this.alive && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead")) {
+            this.bird.bringToTop();
+            this.alive = false;
             this.smackSound.play();
             this.endGame();
         }
@@ -368,10 +369,12 @@ var mainState = {
         this.bird.body.data.gravityScale = 0;
         this.bird.body.static = true;
         this.bird.alive = false
+
         // If dying from ground hit, finish off the game
-        if (!this.gameOver) {
+        if (this.alive) {
             this.smackSound.play();
             this.endGame();
+            this.alive = false;
         }
     },
 
@@ -462,8 +465,6 @@ var mainState = {
     restartGame: function () {
         // Start the 'main' state, which restarts the game
         game.state.start('main');
-        if (this.bird.alive)
-            this.smackSound.play();
     },
 
     addOnePipe: function (x, y, isHead) {

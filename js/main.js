@@ -248,12 +248,12 @@ var mainState = {
             game.add.tween(this.tap).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
             game.add.tween(this.getReady).to({ alpha: 0 }, 500, Phaser.Easing.Linear.None, true, 0, 0, false);
             this.bird.body.data.gravityScale = 1;
+            this.gameStart = true;
         }
 
         if (!this.alive)
             return;
 
-        this.gameStart = true;
         this.bird.body.velocity.y = BIRD_VELOCITY_Y;
 
         if (this.godMode) {
@@ -273,12 +273,10 @@ var mainState = {
     checkPipes: function () {
         if (this.currentRow.length == 0)
             return;
-        else {
-            if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
+        else if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
                 this.currentRow.splice(0, 1);   // Delete first index of array 
                 this.labelScore.text = ++this.score;
                 this.scoreSound.play();
-            }
         }
     },
 
@@ -305,7 +303,7 @@ var mainState = {
             this.bird.body.moveDown(25);
         }
 
-        else if (body.sprite.key == "ground") {
+        else if (body.sprite.key == "ground" || this.bird.y <= 0.5 * this.bird.height) {
             if (this.godMode)
                 // Set to a high number to fight back gravity, otherwise bird will get stuck
                 this.bird.body.moveUp(200);
@@ -316,9 +314,8 @@ var mainState = {
         else if (body.sprite.key == "bullet") {
             // Check if bullet kills bird (bird didn't jump on it or no god mode on)
             if (this.bird.y > body.sprite.y + body.sprite.height * 0.2 && !this.godMode) {
-                this.alive = false;
-                this.smackSound.play();
                 this.bird.bringToTop();
+                this.alive = false;
                 this.endGame();
             }
             else {
@@ -335,7 +332,6 @@ var mainState = {
         else if (!this.godMode && this.alive && (body.sprite.key == "pipe" || body.sprite.key == "pipeHead")) {
             this.bird.bringToTop();
             this.alive = false;
-            this.smackSound.play();
             this.endGame();
         }
         else if (body.sprite.key == "bonusPoints") {
@@ -372,7 +368,6 @@ var mainState = {
 
         // If dying from ground hit, finish off the game
         if (this.alive) {
-            this.smackSound.play();
             this.endGame();
             this.alive = false;
         }
@@ -380,6 +375,10 @@ var mainState = {
 
     // Stops everything in the game
     endGame: function () {
+        var flash = game.add.tween(this.background).to({ tint: 0 }, 50, "Linear", true, 0, 0);
+        flash.yoyo(true, 0);
+        this.smackSound.play();
+
         game.time.events.removeAll(this.timerPipe);
         game.time.events.removeAll(this.timerPowerUp);
         game.time.events.removeAll(this.timerBullet);

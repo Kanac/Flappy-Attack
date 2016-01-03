@@ -12,14 +12,14 @@ var POWERUP_HEIGHT = BIRD_HEIGHT;
 var GODMODE_DURATION = 6000;
 var BULLET_WIDTH = BIRD_WIDTH;
 var BULLET_HEIGHT = BIRD_HEIGHT;
-//var MIN_POWERUP_SPAWN_TIME = 600;
-//var MAX_POWERUP_SPAWN_TIME = 1000;
-//var MIN_BULLET_SPAWN_TIME = 3500;
-//var MAX_BULLET_SPAWN_TIME = 5000;
-var MIN_POWERUP_SPAWN_TIME = 300;
-var MAX_POWERUP_SPAWN_TIME = 300;
-var MIN_BULLET_SPAWN_TIME = 500;
-var MAX_BULLET_SPAWN_TIME = 600;
+var MIN_POWERUP_SPAWN_TIME = 600;
+var MAX_POWERUP_SPAWN_TIME = 1000;
+var MIN_BULLET_SPAWN_TIME = 3500;
+var MAX_BULLET_SPAWN_TIME = 5000;
+//var MIN_POWERUP_SPAWN_TIME = 300;
+//var MAX_POWERUP_SPAWN_TIME = 300;
+//var MIN_BULLET_SPAWN_TIME = 500;
+//var MAX_BULLET_SPAWN_TIME = 600;
 var GROUND_HEIGHT = SCREEN_HEIGHT / 8;
 var PIPE_WIDTH = SCREEN_WIDTH / 6;
 var PIPE_HEIGHT = SCREEN_HEIGHT / 8;
@@ -92,18 +92,7 @@ var mainState = {
         this.background.width = game.width;
         this.background.height = game.height;
 
-        this.ground1 = game.add.sprite(0, SCREEN_HEIGHT * 7 / 8, 'ground');
-        this.ground1.width = SCREEN_WIDTH;
-        this.ground1.height = GROUND_HEIGHT;
-        game.physics.arcade.enable(this.ground1);
-        this.ground1.body.velocity.x = MAP_VELOCITY_X;
-
-        this.ground2 = game.add.sprite(SCREEN_WIDTH, SCREEN_HEIGHT * 7 / 8, 'ground');
-        this.ground2.width = SCREEN_WIDTH;
-        this.ground2.height = GROUND_HEIGHT;
-        game.physics.arcade.enable(this.ground2);
-        this.ground2.body.velocity.x = MAP_VELOCITY_X;
-
+        this.ground = game.add.tileSprite(0, SCREEN_HEIGHT * 7 / 8, SCREEN_WIDTH, GROUND_HEIGHT, "ground");
         this.world.height = SCREEN_WIDTH * 7 / 8;
 
         this.tap = game.add.sprite(SCREEN_WIDTH * 1 / 2 - (SCREEN_WIDTH / 3) / 2, SCREEN_HEIGHT * 4.5 / 10, 'tap');
@@ -156,21 +145,10 @@ var mainState = {
         // Create pipe group
         this.pipes = game.add.group();
         this.pipes.createMultiple(15, 'pipe');
+        this.pipes.createMultiple(6, 'pipeHead');
         this.pipes.forEach(function (p) {
-            p.width = PIPE_WIDTH;
-            p.height = PIPE_HEIGHT;
-            game.physics.p2.enable(p);
-            p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
-            p.body.setCollisionGroup(this.pipeCollisionGroup);
-            p.body.collides(this.birdCollisionGroup);
-            p.body.static = true;
-        }, this)
-
-        this.pipeHeads = game.add.group();
-        this.pipeHeads.createMultiple(6, 'pipeHead');
-        this.pipeHeads.forEach(function (p) {
-            p.width = PIPE_HEAD_WIDTH;
-            p.height = PIPE_HEAD_HEIGHT;
+            p.width = p.key == "pipeHead" ? PIPE_HEAD_WIDTH : PIPE_WIDTH;
+            p.height = p.key == "pipeHead" ? PIPE_HEAD_HEIGHT : PIPE_HEIGHT;
             game.physics.p2.enable(p);
             p.body.setRectangle(p.width, p.height, 0.5 * p.width, 0.5 * p.height);
             p.body.setCollisionGroup(this.pipeCollisionGroup);
@@ -251,7 +229,7 @@ var mainState = {
         if (this.bird.y <= this.bird.height * 0.5)
             this.bird.body.moveDown(10);
 
-        if (this.bird.y >= this.ground1.y - this.bird.height * 0.5) {
+        if (this.bird.y >= this.ground.y - this.bird.height * 0.5) {
             if (this.godMode) {
                 // Set to a high number to fight back gravity, otherwise bird will get stuck
                 this.bird.body.moveUp(100);
@@ -267,12 +245,8 @@ var mainState = {
             this.bird.angle += 2;
         }
 
-        // Scroll the ground to the left 
-        if (this.ground1.x <= -SCREEN_WIDTH + 3)
-            this.ground1.x = SCREEN_WIDTH;
-
-        if (this.ground2.x <= -SCREEN_WIDTH + 3)
-            this.ground2.x = SCREEN_WIDTH;
+        if (this.bird.alive)
+            this.ground.tilePosition.x += MAP_VELOCITY_X / 60;
 
         this.checkPipes();
     },
@@ -407,18 +381,12 @@ var mainState = {
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
-        this.pipeHeads.forEachAlive(function (p) {
-            p.body.velocity.x = 0;
-        }, this);
         this.powerUps.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
         this.bullets.forEachAlive(function (p) {
             p.body.velocity.x = 0;
         }, this);
-
-        this.ground1.body.velocity.x = 0;
-        this.ground2.body.velocity.x = 0;
 
         this.labelScore.alpha = 0;
         this.labelScore.x = SCREEN_WIDTH * 3 / 4;
@@ -497,13 +465,17 @@ var mainState = {
 
     addOnePipe: function (x, y, isHead) {
         // Get the first dead pipe of our group
-        var pipe = isHead ? this.pipeHeads.getFirstDead() : this.pipes.getFirstDead();
+        do {
+            var pipe = this.pipes.getRandom();
+        } while (!((pipe.key == "pipeHead" && isHead) || (pipe.key == "pipe" && !isHead)) || pipe.alive)
+
+        // Set anchor back to 0, since p2 changes it to 0.5
         pipe.anchor.setTo(0);
 
         // Set the new position of the pipe
         if (isHead)
             // Calculate where to place pipehead so thats its in the middle of a pipe
-            pipe.reset((x - (this.pipeHeads.getFirstDead().width - this.pipes.getFirstDead().width) / 2), y);
+            pipe.reset((x - (PIPE_HEAD_WIDTH - PIPE_WIDTH) / 2), y);
         else
             pipe.reset(x, y);
 

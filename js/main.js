@@ -219,8 +219,10 @@ var mainState = {
         this.labelPause.inputEnabled = true;
         this.labelPause.events.onInputDown.add(this.pause, this);
 
-        // Add in ability to resume
-        game.input.onDown.add(this.resume, this);
+        // Add in ability to tap to jump or resume if paused
+        this.background.inputEnabled = true;
+        this.background.events.onInputDown.add(this.jump, this);
+        game.input.onDown.add(this.resume, this, 0, 'game');
 
         this.gameStart = false;
         this.alive = true;  // Use a boolean before signalling bird.alive (will change properties)

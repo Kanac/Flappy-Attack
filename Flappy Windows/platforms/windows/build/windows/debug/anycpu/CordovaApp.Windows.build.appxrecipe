@@ -9,194 +9,194 @@
     <SolutionConfiguration>debug|anycpu</SolutionConfiguration>
     <PackageArchitecture>neutral</PackageArchitecture>
     <PackageIdentityName>Bird</PackageIdentityName>
-    <IntermediateOutputPath>C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\build\windows\bld\</IntermediateOutputPath>
+    <IntermediateOutputPath>C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\build\windows\bld\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <AppXManifest Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\build\windows\debug\anycpu\AppxManifest.xml">
+    <AppXManifest Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\build\windows\debug\anycpu\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\SplashScreen.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\SplashScreen.scale-100.png">
       <PackagePath>images\SplashScreen.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Square150x150Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Square150x150Logo.scale-100.png">
       <PackagePath>images\Square150x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Square30x30Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Square30x30Logo.scale-100.png">
       <PackagePath>images\Square30x30Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Square310x310Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Square310x310Logo.scale-100.png">
       <PackagePath>images\Square310x310Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Square44x44Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Square44x44Logo.scale-100.png">
       <PackagePath>images\Square44x44Logo.scale-100.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Square70x70Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Square70x70Logo.scale-100.png">
       <PackagePath>images\Square70x70Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Square71x71Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Square71x71Logo.scale-100.png">
       <PackagePath>images\Square71x71Logo.scale-100.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\StoreLogo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\StoreLogo.scale-100.png">
       <PackagePath>images\StoreLogo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\images\Wide310x150Logo.scale-100.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\images\Wide310x150Logo.scale-100.png">
       <PackagePath>images\Wide310x150Logo.scale-100.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\bg1.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\bg1.png">
       <PackagePath>www\assets\bg1.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\bg2.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\bg2.png">
       <PackagePath>www\assets\bg2.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\bird.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\bird.png">
       <PackagePath>www\assets\bird.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\BlueBird.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\BlueBird.png">
       <PackagePath>www\assets\BlueBird.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\BonusPoints.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\BonusPoints.png">
       <PackagePath>www\assets\BonusPoints.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\BronzeMedal.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\BronzeMedal.png">
       <PackagePath>www\assets\BronzeMedal.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\BulletBoth.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\BulletBoth.png">
       <PackagePath>www\assets\BulletBoth.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\Continue.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\Continue.png">
       <PackagePath>www\assets\Continue.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\EndPipe.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\EndPipe.png">
       <PackagePath>www\assets\EndPipe.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\FlappyBird.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\FlappyBird.png">
       <PackagePath>www\assets\FlappyBird.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\GameOver.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\GameOver.png">
       <PackagePath>www\assets\GameOver.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\GetReady.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\GetReady.png">
       <PackagePath>www\assets\GetReady.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\GodMode.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\GodMode.png">
       <PackagePath>www\assets\GodMode.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\GoldMedal.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\GoldMedal.png">
       <PackagePath>www\assets\GoldMedal.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\ground.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\ground.png">
       <PackagePath>www\assets\ground.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\MiddlePipe.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\MiddlePipe.png">
       <PackagePath>www\assets\MiddlePipe.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\pipe.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\pipe.png">
       <PackagePath>www\assets\pipe.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\PowerUps.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\PowerUps.png">
       <PackagePath>www\assets\PowerUps.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\Record.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\Record.png">
       <PackagePath>www\assets\Record.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\RedBird.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\RedBird.png">
       <PackagePath>www\assets\RedBird.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\RedBird2 .png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\RedBird2 .png">
       <PackagePath>www\assets\RedBird2 .png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\Share.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\Share.png">
       <PackagePath>www\assets\Share.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\SilverMedal.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\SilverMedal.png">
       <PackagePath>www\assets\SilverMedal.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\Tap.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\Tap.png">
       <PackagePath>www\assets\Tap.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\YellowBird.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\YellowBird.png">
       <PackagePath>www\assets\YellowBird.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\img\logo.png">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\img\logo.png">
       <PackagePath>www\img\logo.png</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\boom.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\boom.mp3">
       <PackagePath>www\assets\boom.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\die.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\die.mp3">
       <PackagePath>www\assets\die.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\GodModeSong.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\GodModeSong.mp3">
       <PackagePath>www\assets\GodModeSong.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\jump.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\jump.mp3">
       <PackagePath>www\assets\jump.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\score.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\score.mp3">
       <PackagePath>www\assets\score.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\smack.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\smack.mp3">
       <PackagePath>www\assets\smack.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\woosh.mp3">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\woosh.mp3">
       <PackagePath>www\assets\woosh.mp3</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\DIMITRI_.eot">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\DIMITRI_.eot">
       <PackagePath>www\assets\DIMITRI_.eot</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\DIMITRI_.TTF">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\DIMITRI_.TTF">
       <PackagePath>www\assets\DIMITRI_.TTF</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\assets\DIMITRI_.woff">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\assets\DIMITRI_.woff">
       <PackagePath>www\assets\DIMITRI_.woff</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\cordova-js-src\exec.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\cordova-js-src\exec.js">
       <PackagePath>www\cordova-js-src\exec.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\cordova-js-src\platform.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\cordova-js-src\platform.js">
       <PackagePath>www\cordova-js-src\platform.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\cordova.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\cordova.js">
       <PackagePath>www\cordova.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\cordova_plugins.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\cordova_plugins.js">
       <PackagePath>www\cordova_plugins.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\js\main.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\js\main.js">
       <PackagePath>www\js\main.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\js\phaser.min.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\js\phaser.min.js">
       <PackagePath>www\js\phaser.min.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\WinJS\js\base.js">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\WinJS\js\base.js">
       <PackagePath>www\WinJS\js\base.js</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\css\bgstyle.css">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\css\bgstyle.css">
       <PackagePath>www\css\bgstyle.css</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\css\index.css">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\css\index.css">
       <PackagePath>www\css\index.css</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\index.html">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\index.html">
       <PackagePath>www\index.html</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\www\index2.html">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\www\index2.html">
       <PackagePath>www\index2.html</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\config.xml">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\config.xml">
       <PackagePath>config.xml</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\build\windows\debug\anycpu\resources.pri">
+    <AppxPackagedFile Include="C:\Users\Anthony C\Downloads\Flappy Bird\Flappy Windows\platforms\windows\build\windows\debug\anycpu\resources.pri">
       <PackagePath>resources.pri</PackagePath>
     </AppxPackagedFile>
   </ItemGroup>

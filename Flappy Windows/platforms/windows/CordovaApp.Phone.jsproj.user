@@ -3,4 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>AppHostDeviceDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup>
+    <ReferenceCachePath>C:\Users\Anthony C\AppData\Local\Temp\CordovaApp.Phone_refcache</ReferenceCachePath>
+  </PropertyGroup>
 </Project>

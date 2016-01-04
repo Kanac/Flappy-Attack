@@ -6,9 +6,9 @@ var SCREEN_HEIGHT = window.innerHeight;
 
 var MAP_VELOCITY_X = SCREEN_WIDTH / -2
 var GRAVITY_Y = SCREEN_HEIGHT * 2;
-var BIRD_WIDTH = 45 * SCREEN_WIDTH / 600;
+var BIRD_WIDTH = SCREEN_WIDTH > SCREEN_HEIGHT ? 45 * SCREEN_WIDTH / 600 : 45 * SCREEN_HEIGHT / 600;
 var BIRD_HEIGHT = BIRD_WIDTH;
-var BIRD_VELOCITY_Y = SCREEN_WIDTH * -6 / 8;
+var BIRD_VELOCITY_Y = SCREEN_HEIGHT * -5 / 8;
 var POWERUP_WIDTH = BIRD_WIDTH;
 var POWERUP_HEIGHT = BIRD_HEIGHT;
 var GODMODE_DURATION = 6000;
@@ -35,7 +35,7 @@ window.onload = function () {
     document.getElementById("gameDiv").setAttribute("style", "width:" + SCREEN_WIDTH + "px;height:" + SCREEN_HEIGHT + "px; margin: 0 auto");
 };
 
-var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(SCREEN_WIDTH, SCREEN_HEIGHT, Phaser.CANVAS, 'gameDiv');
 
 // Create our 'main' state that will contain the game
 var mainState = {
@@ -229,6 +229,7 @@ var mainState = {
         ++gameCount;
     },
 
+
     // This function is called 60 times per second    
     update: function () {
         // Don't change bird angle before game starts
@@ -243,6 +244,7 @@ var mainState = {
 
         this.checkPipes();
     },
+
 
     jump: function () {
         if (!this.gameStart) {
@@ -275,17 +277,17 @@ var mainState = {
         if (this.currentRow.length == 0)
             return;
         else if (this.bird.x >= this.currentRow[0].x + this.currentRow[0].width) {
-                this.currentRow.splice(0, 1);   // Delete first index of array 
-                this.labelScore.text = ++this.score;
-                //this.scoreSound.play();
+            this.currentRow.splice(0, 1);   // Delete first index of array 
+            this.labelScore.text = ++this.score;
+            //this.scoreSound.play();
         }
     },
 
     pause: function (item) {
-        //if (this.bird.alive) {
-        //    game.paused = true;
-        //    this.labelPause.text = "Resume";
-        //}
+        if (this.bird.alive) {
+            game.paused = true;
+            this.labelPause.text = "Resume";
+        }
     },
 
     resume: function (event) {
@@ -353,6 +355,8 @@ var mainState = {
             //this.godModeSong.onStop.addOnce(function () {
             //    this.godMode = false;
             //}, this);
+            game.time.events.remove(this.timerGodMode);
+            this.timerGodMode = game.time.events.add(GODMODE_DURATION, function () { this.godMode = false; }, this);
         }
     },
 
@@ -383,6 +387,7 @@ var mainState = {
         game.time.events.removeAll(this.timerPipe);
         game.time.events.removeAll(this.timerPowerUp);
         game.time.events.removeAll(this.timerBullet);
+        game.time.events.removeAll(this.timerGodMode);
 
         this.pipes.forEachAlive(function (p) {
             p.body.velocity.x = 0;

@@ -1,0 +1,1 @@
+C:\Users\Anthony C\Downloads\Apache Cordova\Flappy\platforms\windows\CordovaApp.Phone.jsproj;neutral
